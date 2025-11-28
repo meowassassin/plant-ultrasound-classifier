@@ -371,7 +371,7 @@ data/raw/PlantSounds/
 
 ### MyModel (Baseline CNN + VAE + SSL + DG)
 
-![MyModel](experiments/figures/mymodel_architecture.png)
+![MyModel](experiments/figures/mymodel_architecture.svg)
 
 **Architecture Details**:
 
@@ -960,11 +960,12 @@ data/raw/PlantSounds/
 
 ### Baseline CNN (Khait et al., 2023)
 
-![Baseline CNN](experiments/figures/baseline_architecture.png)
+![Baseline](experiments/figures/baseline_architecture.svg)
 
 ### MyModel (Baseline CNN + VAE + SSL + DG)
 
-![MyModel](experiments/figures/mymodel_architecture.png)
+![MyModel](experiments/figures/mymodel_architecture.svg)
+
 
 **아키텍처 상세**:
 
