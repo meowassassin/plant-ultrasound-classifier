@@ -960,37 +960,11 @@ data/raw/PlantSounds/
 
 ### Baseline CNN (Khait et al., 2023)
 
-```
-입력 (1000 샘플 @ 500kHz)
-  ↓
-[Conv1D(32) + ReLU] × 2 → MaxPool → Dropout(0.5)
-  ↓
-[Conv1D(64) + ReLU] × 2 → MaxPool → Dropout(0.5)
-  ↓
-[Conv1D(128) + ReLU] × 2 → MaxPool → Dropout(0.5)
-  ↓
-Flatten → Dense(128) → Dropout(0.5) → Dense(1, sigmoid)
-```
+![Baseline CNN](experiments/figures/baseline_architecture.png)
 
 ### MyModel (Baseline CNN + VAE + SSL + DG)
 
-```
-입력 (1000 샘플 @ 500kHz)
-  ↓
-[Baseline과 동일한 CNN Backbone]
-  - [Conv1D(32) + ReLU] × 2 → MaxPool → Dropout(0.5)
-  - [Conv1D(64) + ReLU] × 2 → MaxPool → Dropout(0.5)
-  - [Conv1D(128) + ReLU] × 2 → MaxPool → Dropout(0.5)
-  - Flatten → Dense(128) → Dropout(0.5)
-  ↓
-임베딩 h [128차원]
-  ↓
-┌─────────────┬──────────────┬─────────────┐
-│   Main      │    VAE       │     DG      │
-│ Classifier  │  (z → h_rec) │   Domain    │
-│   h → y     │              │ Classifier  │
-└─────────────┴──────────────┴─────────────┘
-```
+![MyModel](experiments/figures/mymodel_architecture.png)
 
 **아키텍처 상세**:
 
