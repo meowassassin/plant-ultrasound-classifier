@@ -367,7 +367,7 @@ data/raw/PlantSounds/
 
 ### Baseline CNN (Khait et al., 2023)
 
-![Baseline CNN](experiments/figures/baseline_architecture.png)
+<img<src=experiments/figures/baseline_architecture.png width=300, height=500>
 
 ### MyModel (Baseline CNN + VAE + SSL + DG)
 
