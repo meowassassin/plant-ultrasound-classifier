@@ -140,7 +140,7 @@ data/raw/PlantSounds/
 
 **Challenge**: Each individual plant experienced only ONE type of stress (either dry OR cut), making this a particularly challenging classification task. In LOPO cross-validation, when a plant is used as the test set, that fold contains only one class, requiring the model to generalize from sounds of other plants under different stress conditions.
 
-**Results**:
+**Results** (see Fig. 1a, 1b, 1e, 1g):
 
 - **Baseline CNN**: 95.2% balanced accuracy
 - **MyModel (full labels)**: 97.6% balanced accuracy (+2.4%)
@@ -159,7 +159,7 @@ data/raw/PlantSounds/
 
 **Challenge**: Same single-class fold challenge as Task 1.1, but with tobacco plants.
 
-**Results**:
+**Results** (see Fig. 1a, 1b, 1f, 1g):
 
 - **Baseline CNN**: 87.7% balanced accuracy
 - **MyModel (full labels)**: **100.0%** balanced accuracy (perfect classification!)
@@ -180,7 +180,7 @@ data/raw/PlantSounds/
 
 **Challenge**: Both species are under the same stress condition, so the model must learn species-specific acoustic characteristics rather than stress patterns.
 
-**Results**:
+**Results** (see Fig. 1a):
 
 - **Baseline CNN**: 87.5% balanced accuracy
 - **MyModel (full labels)**: 88.7% balanced accuracy (+1.2%)
@@ -199,7 +199,7 @@ data/raw/PlantSounds/
 
 **Challenge**: Same as Task 1.3, but with cut condition.
 
-**Results**:
+**Results** (see Fig. 1a):
 
 - **Baseline CNN**: 93.4% balanced accuracy
 - **MyModel (full labels)**: 96.9% balanced accuracy (+3.5%)
@@ -211,15 +211,37 @@ data/raw/PlantSounds/
 
 #### Task 1 Results Visualization
 
+**Figure 1a: Task 1 Mean Balanced Accuracy Comparison**
 ![Task 1 Bar Chart](experiments/figures/task1_balanced_accuracy_bar.png)
+*Comparison of mean balanced accuracy across all 4 Task 1 subtasks. Shows Baseline CNN, MyModel (100% labels), and MyModel (50% labels) performance.*
 
-![Task 1 Dry vs Cut Analysis](experiments/figures/task1_single_class_fold_analysis.png)
-
+**Figure 1b: Task 1 Fold-wise Accuracy Distribution**
 ![Task 1 Boxplot](experiments/figures/task1_balanced_accuracy_boxplot.png)
+*Distribution of fold-wise balanced accuracy for each Task 1 subtask. Compares Baseline CNN vs MyModel performance variability.*
 
+**Figure 1c: Task 1 Baseline vs MyModel Comparison**
 ![Task 1 Paired Scatter](experiments/figures/task1_paired_scatter.png)
+*Fold-by-fold comparison between Baseline and MyModel. Each point represents one LOPO fold. Points above y=x line indicate MyModel outperforms Baseline.*
 
+**Figure 1d: Task 1 Confusion Matrices**
 ![Task 1 Confusion Matrices](experiments/figures/task1_confusion_matrices.png)
+*Pooled confusion matrices across all LOPO folds for each Task 1 subtask. Shows classification errors for both Baseline and MyModel.*
+
+**Figure 1e: Fold-wise Accuracy for Dry Samples**
+![Task 1 Fold Accuracy Dry](experiments/figures/task1_fold_accuracy_dry.png)
+*Per-fold accuracy comparison for dry-stressed samples in tomato and tobacco. Each point represents one LOPO fold where the test plant was under drought stress.*
+
+**Figure 1f: Fold-wise Accuracy for Cut Samples**
+![Task 1 Fold Accuracy Cut](experiments/figures/task1_fold_accuracy_cut.png)
+*Per-fold accuracy comparison for cut-stressed samples in tomato and tobacco. Each point represents one LOPO fold where the test plant had mechanical stem damage.*
+
+**Figure 1g: Class-wise Accuracy Comparison**
+![Task 1 Classwise Accuracy](experiments/figures/task1_classwise_accuracy_bar.png)
+*Mean accuracy breakdown by stress condition (dry vs cut) for tomato and tobacco classification tasks. Shows how well models perform on each specific stress type.*
+
+**Figure 1h: Sequential Performance by Condition**
+![Task 1 Sequential Performance](experiments/figures/task1_sequential_performance.png)
+*Sequential fold-wise performance colored by stress condition. Visualizes performance patterns across all LOPO folds with color-coding for dry (blue/gold) vs cut (pink/orange) samples.*
 
 ---
 
@@ -236,7 +258,7 @@ data/raw/PlantSounds/
 
 **Cross-Validation**: LOPO (Leave-One-Plant-Out) for plant sounds, with empty pot samples divided into K groups to match the number of plant folds.
 
-**Results**:
+**Results** (see Fig. 2a, 2c):
 
 - **Baseline CNN**: 95.9% balanced accuracy
 - **MyModel**: 98.5% balanced accuracy (+2.6%)
@@ -264,7 +286,7 @@ data/raw/PlantSounds/
 
 **Cross-Validation**: LOPO for plant sounds, with greenhouse noise samples divided into K groups.
 
-**Results**:
+**Results** (see Fig. 2a, 2c):
 
 - **Baseline CNN**: 98.4% balanced accuracy
 - **MyModel**: 98.2% balanced accuracy (-0.2%)
@@ -280,11 +302,17 @@ data/raw/PlantSounds/
 
 ### Task 2 & 3 Results Visualization
 
+**Figure 2a: Task 2/3 Mean Balanced Accuracy Comparison**
 ![Task 2/3 Bar Chart](experiments/figures/task2_task3_balanced_accuracy_bar.png)
+*Mean balanced accuracy comparison for Task 2 (plant vs empty pot) and Task 3 (tomato vs greenhouse noise). Both tasks show >95% accuracy.*
 
+**Figure 2b: Task 2/3 Baseline vs MyModel Comparison**
 ![Task 2/3 Paired Scatter](experiments/figures/task2_task3_paired_scatter.png)
+*Fold-wise performance comparison between Baseline and MyModel for Task 2 and Task 3. Shows consistent high performance across folds.*
 
+**Figure 2c: Task 2/3 Confusion Matrices**
 ![Task 2/3 Confusion Matrices](experiments/figures/task2_task3_confusion_matrices.png)
+*Pooled confusion matrices for Task 2 and Task 3. Demonstrates strong class separation in plant vs noise classification.*
 
 ---
 
@@ -306,7 +334,7 @@ data/raw/PlantSounds/
 2. Unlabeled samples: Consistency loss between predictions under different augmentations
 3. Combined training: Balances supervised and unsupervised objectives
 
-**Results Analysis**:
+**Results Analysis** (see Fig. 3):
 
 | Task | Baseline | 100% Labels | 50% Labels | Drop | Relative Retention |
 |------|----------|-------------|------------|------|-------------------|
@@ -329,7 +357,9 @@ data/raw/PlantSounds/
 
 ### Task 4 Results Visualization
 
+**Figure 3: Task 4 Semi-Supervised Learning Effect**
 ![Task 4 Label Fraction Effect](experiments/figures/task4_label_fraction_effect.png)
+*Semi-supervised learning effect across all 4 Task 1 subtasks. Shows MyModel performance with 50% vs 100% labels compared to Baseline. Demonstrates label efficiency with minimal performance drop.*
 
 ---
 
@@ -349,27 +379,42 @@ Input (1000 samples @ 500kHz)
 Flatten → Dense(128) → Dropout(0.5) → Dense(1, sigmoid)
 ```
 
-### MyModel (Enhanced Architecture)
+### MyModel (Baseline CNN + VAE + SSL + DG)
 
 ```
 Input (1000 samples @ 500kHz)
   ↓
-[ResBlock(32)] × 2 → MaxPool → Dropout(0.3)
+[Same CNN Backbone as Baseline]
+  - [Conv1D(32) + ReLU] × 2 → MaxPool → Dropout(0.5)
+  - [Conv1D(64) + ReLU] × 2 → MaxPool → Dropout(0.5)
+  - [Conv1D(128) + ReLU] × 2 → MaxPool → Dropout(0.5)
+  - Flatten → Dense(128) → Dropout(0.5)
   ↓
-[ResBlock(64)] × 2 → MaxPool → Dropout(0.3)
+Embedding h [128-dim]
   ↓
-[ResBlock(128)] × 2 → MaxPool → Dropout(0.3)
-  ↓
-[ResBlock(256)] × 2 → Adaptive AvgPool
-  ↓
-Attention Layer → Dense(256) → Dropout(0.4) → Dense(1, sigmoid)
+┌─────────────┬──────────────┬─────────────┐
+│   Main      │    VAE       │     DG      │
+│ Classifier  │  (z → h_rec) │   Domain    │
+│   h → y     │              │ Classifier  │
+└─────────────┴──────────────┴─────────────┘
 ```
 
-**Key Improvements**:
-- Residual connections for better gradient flow
-- Attention mechanism for feature weighting
-- Deeper architecture (256 filters)
-- Adaptive pooling for variable-length inputs
+**Architecture Details**:
+
+- **Backbone**: Identical CNN structure to Baseline (Khait et al., 2023)
+- **Embedding h**: 128-dimensional feature representation from CNN backbone
+- **Main Classifier**: h → binary logit (BCEWithLogitsLoss)
+- **VAE Module**:
+  - Encoder: h → (μ, log σ²) in 32-dim latent space
+  - Reparameterization: z = μ + σ ⊙ ε
+  - Decoder: z → h_reconstructed
+  - Loss: MSE(h, h_rec) + β·KL(q(z|h) || N(0, I))
+- **SSL (Semi-Supervised Learning)**:
+  - Consistency regularization between z(x) and z(x_augmented)
+  - Enables learning from unlabeled data (50% label experiments)
+- **DG (Domain Generalization)**:
+  - Domain classifier head: h → domain logits
+  - Improves robustness across recording conditions
 
 ---
 
@@ -714,7 +759,7 @@ data/raw/PlantSounds/
 
 **도전 과제**: 각 개별 식물은 하나의 스트레스 유형(dry 또는 cut)만 경험했습니다. 이는 특히 어려운 분류 과제입니다. LOPO 교차 검증에서 한 식물이 테스트 세트로 사용될 때, 해당 fold는 하나의 클래스만 포함하므로 모델은 다른 스트레스 조건의 다른 식물 소리로부터 일반화해야 합니다.
 
-**결과**:
+**결과** (그림 1a, 1b, 1e, 1g 참조):
 
 - **Baseline CNN**: 95.2% 균형 정확도
 - **MyModel (전체 라벨)**: 97.6% 균형 정확도 (+2.4%)
@@ -733,7 +778,7 @@ data/raw/PlantSounds/
 
 **도전 과제**: Task 1.1과 동일한 단일 클래스 fold 문제이지만 담배 식물 대상.
 
-**결과**:
+**결과** (그림 1a, 1b, 1f, 1g 참조):
 
 - **Baseline CNN**: 87.7% 균형 정확도
 - **MyModel (전체 라벨)**: **100.0%** 균형 정확도 (완벽한 분류!)
@@ -754,7 +799,7 @@ data/raw/PlantSounds/
 
 **도전 과제**: 두 종이 동일한 스트레스 조건에 있으므로, 모델은 스트레스 패턴이 아닌 종 특정 음향 특성을 학습해야 합니다.
 
-**결과**:
+**결과** (그림 1a 참조):
 
 - **Baseline CNN**: 87.5% 균형 정확도
 - **MyModel (전체 라벨)**: 88.7% 균형 정확도 (+1.2%)
@@ -773,7 +818,7 @@ data/raw/PlantSounds/
 
 **도전 과제**: Task 1.3과 동일하지만 cut 조건.
 
-**결과**:
+**결과** (그림 1a 참조):
 
 - **Baseline CNN**: 93.4% 균형 정확도
 - **MyModel (전체 라벨)**: 96.9% 균형 정확도 (+3.5%)
@@ -785,15 +830,37 @@ data/raw/PlantSounds/
 
 #### Task 1 결과 시각화
 
+**그림 1a: Task 1 평균 균형 정확도 비교**
 ![Task 1 막대 그래프](experiments/figures/task1_balanced_accuracy_bar.png)
+*4개 Task 1 하위 과제 전체의 평균 균형 정확도 비교. Baseline CNN, MyModel (100% 라벨), MyModel (50% 라벨) 성능을 보여줌.*
 
-![Task 1 Dry vs Cut 분석](experiments/figures/task1_single_class_fold_analysis.png)
-
+**그림 1b: Task 1 Fold별 정확도 분포**
 ![Task 1 박스플롯](experiments/figures/task1_balanced_accuracy_boxplot.png)
+*각 Task 1 하위 과제의 fold별 균형 정확도 분포. Baseline CNN vs MyModel 성능 변동성 비교.*
 
+**그림 1c: Task 1 Baseline vs MyModel 비교**
 ![Task 1 쌍별 산점도](experiments/figures/task1_paired_scatter.png)
+*Baseline과 MyModel의 fold별 비교. 각 점은 하나의 LOPO fold를 나타냄. y=x 선 위의 점은 MyModel이 Baseline을 능가함을 나타냄.*
 
+**그림 1d: Task 1 혼동 행렬**
 ![Task 1 혼동 행렬](experiments/figures/task1_confusion_matrices.png)
+*각 Task 1 하위 과제의 모든 LOPO fold에 대한 통합 혼동 행렬. Baseline과 MyModel 모두의 분류 오류를 보여줌.*
+
+**그림 1e: Dry 샘플 Fold별 정확도**
+![Task 1 Fold 정확도 Dry](experiments/figures/task1_fold_accuracy_dry.png)
+*토마토와 담배의 dry 스트레스 샘플에 대한 fold별 정확도 비교. 각 점은 테스트 식물이 가뭄 스트레스를 받은 하나의 LOPO fold를 나타냄.*
+
+**그림 1f: Cut 샘플 Fold별 정확도**
+![Task 1 Fold 정확도 Cut](experiments/figures/task1_fold_accuracy_cut.png)
+*토마토와 담배의 cut 스트레스 샘플에 대한 fold별 정확도 비교. 각 점은 테스트 식물이 줄기 기계적 손상을 받은 하나의 LOPO fold를 나타냄.*
+
+**그림 1g: 클래스별 정확도 비교**
+![Task 1 클래스별 정확도](experiments/figures/task1_classwise_accuracy_bar.png)
+*토마토와 담배 분류 작업에 대한 스트레스 조건(dry vs cut)별 평균 정확도 분석. 각 특정 스트레스 유형에 대한 모델 성능을 보여줌.*
+
+**그림 1h: 조건별 순차 성능**
+![Task 1 순차 성능](experiments/figures/task1_sequential_performance.png)
+*스트레스 조건별로 색상 코딩된 순차 fold별 성능. 모든 LOPO fold에 걸친 성능 패턴을 dry(파랑/금색) vs cut(분홍/주황) 샘플에 대한 색상 코딩으로 시각화.*
 
 ---
 
@@ -810,7 +877,7 @@ data/raw/PlantSounds/
 
 **교차 검증**: 식물 소리에 대해 LOPO (Leave-One-Plant-Out), 빈 화분 샘플은 식물 fold 수와 일치하도록 K개 그룹으로 분할.
 
-**결과**:
+**결과** (그림 2a, 2c 참조):
 
 - **Baseline CNN**: 95.9% 균형 정확도
 - **MyModel**: 98.5% 균형 정확도 (+2.6%)
@@ -838,7 +905,7 @@ data/raw/PlantSounds/
 
 **교차 검증**: 식물 소리에 대해 LOPO, 온실 소음 샘플은 K개 그룹으로 분할.
 
-**결과**:
+**결과** (그림 2a, 2c 참조):
 
 - **Baseline CNN**: 98.4% 균형 정확도
 - **MyModel**: 98.2% 균형 정확도 (-0.2%)
@@ -854,11 +921,17 @@ data/raw/PlantSounds/
 
 ### Task 2 & 3 결과 시각화
 
+**그림 2a: Task 2/3 평균 균형 정확도 비교**
 ![Task 2/3 막대 그래프](experiments/figures/task2_task3_balanced_accuracy_bar.png)
+*Task 2 (식물 vs 빈 화분)와 Task 3 (토마토 vs 온실 소음)의 평균 균형 정확도 비교. 두 작업 모두 >95% 정확도를 보여줌.*
 
+**그림 2b: Task 2/3 Baseline vs MyModel 비교**
 ![Task 2/3 쌍별 산점도](experiments/figures/task2_task3_paired_scatter.png)
+*Task 2와 Task 3에 대한 Baseline과 MyModel의 fold별 성능 비교. 모든 fold에서 일관된 높은 성능을 보여줌.*
 
+**그림 2c: Task 2/3 혼동 행렬**
 ![Task 2/3 혼동 행렬](experiments/figures/task2_task3_confusion_matrices.png)
+*Task 2와 Task 3의 통합 혼동 행렬. 식물 vs 소음 분류에서 강력한 클래스 분리를 보여줌.*
 
 ---
 
@@ -880,7 +953,7 @@ data/raw/PlantSounds/
 2. 라벨링되지 않은 샘플: 서로 다른 증강 하의 예측 간 일관성 손실
 3. 결합 훈련: 지도 및 비지도 목적 균형
 
-**결과 분석**:
+**결과 분석** (그림 3 참조):
 
 | Task | Baseline | 100% 라벨 | 50% 라벨 | 감소 | 상대 유지율 |
 |------|----------|-----------|----------|------|------------|
@@ -903,7 +976,9 @@ data/raw/PlantSounds/
 
 ### Task 4 결과 시각화
 
+**그림 3: Task 4 반지도 학습 효과**
 ![Task 4 라벨 비율 효과](experiments/figures/task4_label_fraction_effect.png)
+*4개 Task 1 하위 과제 전체의 반지도 학습 효과. Baseline과 비교하여 50% vs 100% 라벨 사용 시 MyModel 성능을 보여줌. 최소한의 성능 저하로 라벨 효율성을 입증.*
 
 ---
 
@@ -923,27 +998,42 @@ data/raw/PlantSounds/
 Flatten → Dense(128) → Dropout(0.5) → Dense(1, sigmoid)
 ```
 
-### MyModel (개선된 아키텍처)
+### MyModel (Baseline CNN + VAE + SSL + DG)
 
 ```
 입력 (1000 샘플 @ 500kHz)
   ↓
-[ResBlock(32)] × 2 → MaxPool → Dropout(0.3)
+[Baseline과 동일한 CNN Backbone]
+  - [Conv1D(32) + ReLU] × 2 → MaxPool → Dropout(0.5)
+  - [Conv1D(64) + ReLU] × 2 → MaxPool → Dropout(0.5)
+  - [Conv1D(128) + ReLU] × 2 → MaxPool → Dropout(0.5)
+  - Flatten → Dense(128) → Dropout(0.5)
   ↓
-[ResBlock(64)] × 2 → MaxPool → Dropout(0.3)
+임베딩 h [128차원]
   ↓
-[ResBlock(128)] × 2 → MaxPool → Dropout(0.3)
-  ↓
-[ResBlock(256)] × 2 → Adaptive AvgPool
-  ↓
-Attention Layer → Dense(256) → Dropout(0.4) → Dense(1, sigmoid)
+┌─────────────┬──────────────┬─────────────┐
+│   Main      │    VAE       │     DG      │
+│ Classifier  │  (z → h_rec) │   Domain    │
+│   h → y     │              │ Classifier  │
+└─────────────┴──────────────┴─────────────┘
 ```
 
-**주요 개선사항**:
-- 더 나은 gradient flow를 위한 잔차 연결
-- 특징 가중치를 위한 어텐션 메커니즘
-- 더 깊은 아키텍처 (256 필터)
-- 가변 길이 입력을 위한 적응형 풀링
+**아키텍처 상세**:
+
+- **Backbone**: Baseline과 동일한 CNN 구조 (Khait et al., 2023)
+- **임베딩 h**: CNN backbone에서 추출한 128차원 특징 표현
+- **Main Classifier**: h → 이진 로짓 (BCEWithLogitsLoss)
+- **VAE 모듈**:
+  - 인코더: h → (μ, log σ²) 32차원 잠재 공간
+  - 재매개변수화: z = μ + σ ⊙ ε
+  - 디코더: z → h_재구성
+  - 손실: MSE(h, h_rec) + β·KL(q(z|h) || N(0, I))
+- **SSL (반지도 학습)**:
+  - z(x)와 z(x_증강) 간 일관성 정규화
+  - 라벨 없는 데이터 학습 가능 (50% 라벨 실험)
+- **DG (도메인 일반화)**:
+  - 도메인 분류기 헤드: h → 도메인 로짓
+  - 녹음 조건 간 강건성 향상
 
 ---
 
