@@ -367,37 +367,11 @@ data/raw/PlantSounds/
 
 ### Baseline CNN (Khait et al., 2023)
 
-```
-Input (1000 samples @ 500kHz)
-  ↓
-[Conv1D(32) + ReLU] × 2 → MaxPool → Dropout(0.5)
-  ↓
-[Conv1D(64) + ReLU] × 2 → MaxPool → Dropout(0.5)
-  ↓
-[Conv1D(128) + ReLU] × 2 → MaxPool → Dropout(0.5)
-  ↓
-Flatten → Dense(128) → Dropout(0.5) → Dense(1, sigmoid)
-```
+![Baseline CNN](experiments/figures/baseline_architecture.png)
 
 ### MyModel (Baseline CNN + VAE + SSL + DG)
 
-```
-Input (1000 samples @ 500kHz)
-  ↓
-[Same CNN Backbone as Baseline]
-  - [Conv1D(32) + ReLU] × 2 → MaxPool → Dropout(0.5)
-  - [Conv1D(64) + ReLU] × 2 → MaxPool → Dropout(0.5)
-  - [Conv1D(128) + ReLU] × 2 → MaxPool → Dropout(0.5)
-  - Flatten → Dense(128) → Dropout(0.5)
-  ↓
-Embedding h [128-dim]
-  ↓
-┌─────────────┬──────────────┬─────────────┐
-│   Main      │    VAE       │     DG      │
-│ Classifier  │  (z → h_rec) │   Domain    │
-│   h → y     │              │ Classifier  │
-└─────────────┴──────────────┴─────────────┘
-```
+![MyModel](experiments/figures/mymodel_architecture.png)
 
 **Architecture Details**:
 
