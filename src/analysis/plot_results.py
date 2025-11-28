@@ -776,24 +776,134 @@ def load_fold_level_data_with_metadata(exp_root: Path, task_name: str, model_typ
     return results
 
 
-def plot_single_class_fold_analysis(fig_root: Path, exp_root: Path):
-    """
-    Option 1: Per-fold accuracy line plot
-    Option 2: Class-wise accuracy bar chart
-    Option 3: Per-plant performance heatmap
-    Option 4: Sequential plot with condition colors
-
-    All 4 visualizations for tomato and tobacco dry vs cut tasks.
-    """
+def plot_fold_accuracy_dry(fig_root: Path, exp_root: Path):
+    """Plot fold-wise accuracy for dry samples (tomato and tobacco)"""
     tasks = [
         ("task1_tomato_dry_vs_cut", "Tomato dry vs cut"),
         ("task1_tobacco_dry_vs_cut", "Tobacco dry vs cut"),
     ]
 
-    # Create a 2x2 grid for 4 visualization types
-    fig = plt.figure(figsize=(18, 14))
+    fig, axes = plt.subplots(1, 2, figsize=(14, 5))
 
     for task_idx, (task_name, task_label) in enumerate(tasks):
+        ax = axes[task_idx]
+
+        # Load data
+        base_data = load_fold_level_data_with_metadata(exp_root, task_name, "baseline")
+        my_data = load_fold_level_data_with_metadata(exp_root, task_name, "mymodel")
+
+        if not base_data or not my_data:
+            print(f"[WARN] No data for {task_name}, skipping visualization")
+            continue
+
+        # Separate dry samples
+        base_dry = [(f, a) for f, a, p, c in base_data if c == 'dry']
+        my_dry = [(f, a) for f, a, p, c in my_data if c == 'dry']
+
+        if base_dry:
+            folds_dry, accs_dry = zip(*base_dry)
+            jitter = np.random.RandomState(42).uniform(-0.01, 0.01, len(accs_dry))
+            accs_dry_jittered = np.array(accs_dry) + jitter
+            ax.scatter(folds_dry, accs_dry_jittered, marker='o', s=50,
+                       color='#3274A1', alpha=0.6, edgecolors='black',
+                       linewidth=0.5, label='Baseline (dry)', zorder=3)
+            ax.plot(folds_dry, accs_dry, color='#3274A1', linewidth=1.5,
+                    alpha=0.3, zorder=1)
+        if my_dry:
+            folds_dry, accs_dry = zip(*my_dry)
+            jitter = np.random.RandomState(43).uniform(-0.01, 0.01, len(accs_dry))
+            accs_dry_jittered = np.array(accs_dry) + jitter
+            ax.scatter(folds_dry, accs_dry_jittered, marker='s', s=50,
+                       color='#E1812C', alpha=0.6, edgecolors='black',
+                       linewidth=0.5, label='MyModel (dry)', zorder=3)
+            ax.plot(folds_dry, accs_dry, color='#E1812C', linewidth=1.5,
+                    alpha=0.3, zorder=1)
+
+        ax.axhline(0.5, color='red', linestyle='--', linewidth=1.5, alpha=0.5)
+        ax.set_xlabel('Fold (dry plants)', fontsize=11, fontweight='bold')
+        ax.set_ylabel('Accuracy', fontsize=11, fontweight='bold')
+        ax.set_title(f'{task_label}\nFold-wise Accuracy (Dry)', fontsize=12, fontweight='bold')
+        ax.legend(fontsize=9)
+        ax.set_ylim(-0.05, 1.08)
+        ax.grid(True, alpha=0.3)
+
+    fig.suptitle('Fold-wise Accuracy: Dry Samples',
+                fontsize=15, fontweight='bold', y=0.98)
+    fig.tight_layout(rect=[0, 0.01, 1, 0.95])
+    fig.savefig(fig_root / "task1_fold_accuracy_dry.png", dpi=300, bbox_inches="tight")
+    print(f"Saved: {fig_root / 'task1_fold_accuracy_dry.png'}")
+
+
+def plot_fold_accuracy_cut(fig_root: Path, exp_root: Path):
+    """Plot fold-wise accuracy for cut samples (tomato and tobacco)"""
+    tasks = [
+        ("task1_tomato_dry_vs_cut", "Tomato dry vs cut"),
+        ("task1_tobacco_dry_vs_cut", "Tobacco dry vs cut"),
+    ]
+
+    fig, axes = plt.subplots(1, 2, figsize=(14, 5))
+
+    for task_idx, (task_name, task_label) in enumerate(tasks):
+        ax = axes[task_idx]
+
+        # Load data
+        base_data = load_fold_level_data_with_metadata(exp_root, task_name, "baseline")
+        my_data = load_fold_level_data_with_metadata(exp_root, task_name, "mymodel")
+
+        if not base_data or not my_data:
+            print(f"[WARN] No data for {task_name}, skipping visualization")
+            continue
+
+        # Separate cut samples
+        base_cut = [(f, a) for f, a, p, c in base_data if c == 'cut']
+        my_cut = [(f, a) for f, a, p, c in my_data if c == 'cut']
+
+        if base_cut:
+            folds_cut, accs_cut = zip(*base_cut)
+            jitter = np.random.RandomState(44).uniform(-0.01, 0.01, len(accs_cut))
+            accs_cut_jittered = np.array(accs_cut) + jitter
+            ax.scatter(folds_cut, accs_cut_jittered, marker='o', s=50,
+                       color='#3274A1', alpha=0.6, edgecolors='black',
+                       linewidth=0.5, label='Baseline (cut)', zorder=3)
+            ax.plot(folds_cut, accs_cut, color='#3274A1', linewidth=1.5,
+                    alpha=0.3, zorder=1)
+        if my_cut:
+            folds_cut, accs_cut = zip(*my_cut)
+            jitter = np.random.RandomState(45).uniform(-0.01, 0.01, len(accs_cut))
+            accs_cut_jittered = np.array(accs_cut) + jitter
+            ax.scatter(folds_cut, accs_cut_jittered, marker='s', s=50,
+                       color='#E1812C', alpha=0.6, edgecolors='black',
+                       linewidth=0.5, label='MyModel (cut)', zorder=3)
+            ax.plot(folds_cut, accs_cut, color='#E1812C', linewidth=1.5,
+                    alpha=0.3, zorder=1)
+
+        ax.axhline(0.5, color='red', linestyle='--', linewidth=1.5, alpha=0.5)
+        ax.set_xlabel('Fold (cut plants)', fontsize=11, fontweight='bold')
+        ax.set_ylabel('Accuracy', fontsize=11, fontweight='bold')
+        ax.set_title(f'{task_label}\nFold-wise Accuracy (Cut)', fontsize=12, fontweight='bold')
+        ax.legend(fontsize=9)
+        ax.set_ylim(-0.05, 1.08)
+        ax.grid(True, alpha=0.3)
+
+    fig.suptitle('Fold-wise Accuracy: Cut Samples',
+                fontsize=15, fontweight='bold', y=0.98)
+    fig.tight_layout(rect=[0, 0.01, 1, 0.95])
+    fig.savefig(fig_root / "task1_fold_accuracy_cut.png", dpi=300, bbox_inches="tight")
+    print(f"Saved: {fig_root / 'task1_fold_accuracy_cut.png'}")
+
+
+def plot_classwise_accuracy_bar(fig_root: Path, exp_root: Path):
+    """Plot class-wise accuracy bar chart (dry vs cut)"""
+    tasks = [
+        ("task1_tomato_dry_vs_cut", "Tomato dry vs cut"),
+        ("task1_tobacco_dry_vs_cut", "Tobacco dry vs cut"),
+    ]
+
+    fig, axes = plt.subplots(1, 2, figsize=(14, 5))
+
+    for task_idx, (task_name, task_label) in enumerate(tasks):
+        ax = axes[task_idx]
+
         # Load data
         base_data = load_fold_level_data_with_metadata(exp_root, task_name, "baseline")
         my_data = load_fold_level_data_with_metadata(exp_root, task_name, "mymodel")
@@ -807,69 +917,6 @@ def plot_single_class_fold_analysis(fig_root: Path, exp_root: Path):
         base_cut = [(f, a) for f, a, p, c in base_data if c == 'cut']
         my_dry = [(f, a) for f, a, p, c in my_data if c == 'dry']
         my_cut = [(f, a) for f, a, p, c in my_data if c == 'cut']
-
-        row_offset = task_idx * 4
-
-        # ===== Option 1: Per-fold accuracy line plot =====
-        ax1 = plt.subplot(4, 4, row_offset + 1)
-        if base_dry:
-            folds_dry, accs_dry = zip(*base_dry)
-            # Add small jitter to separate overlapping points
-            jitter = np.random.RandomState(42).uniform(-0.01, 0.01, len(accs_dry))
-            accs_dry_jittered = np.array(accs_dry) + jitter
-            ax1.scatter(folds_dry, accs_dry_jittered, marker='o', s=50,
-                       color='#3274A1', alpha=0.6, edgecolors='black',
-                       linewidth=0.5, label='Baseline (dry)', zorder=3)
-            ax1.plot(folds_dry, accs_dry, color='#3274A1', linewidth=1.5,
-                    alpha=0.3, zorder=1)
-        if my_dry:
-            folds_dry, accs_dry = zip(*my_dry)
-            jitter = np.random.RandomState(43).uniform(-0.01, 0.01, len(accs_dry))
-            accs_dry_jittered = np.array(accs_dry) + jitter
-            ax1.scatter(folds_dry, accs_dry_jittered, marker='s', s=50,
-                       color='#E1812C', alpha=0.6, edgecolors='black',
-                       linewidth=0.5, label='MyModel (dry)', zorder=3)
-            ax1.plot(folds_dry, accs_dry, color='#E1812C', linewidth=1.5,
-                    alpha=0.3, zorder=1)
-
-        ax1.axhline(0.5, color='red', linestyle='--', linewidth=1.5, alpha=0.5)
-        ax1.set_xlabel('Fold (dry plants)', fontsize=10, fontweight='bold')
-        ax1.set_ylabel('Accuracy', fontsize=10, fontweight='bold')
-        ax1.set_title(f'{task_label}\nFold-wise Accuracy (Dry)', fontsize=11, fontweight='bold')
-        ax1.legend(fontsize=8)
-        ax1.set_ylim(-0.05, 1.08)
-        ax1.grid(True, alpha=0.3)
-
-        ax2 = plt.subplot(4, 4, row_offset + 2)
-        if base_cut:
-            folds_cut, accs_cut = zip(*base_cut)
-            jitter = np.random.RandomState(44).uniform(-0.01, 0.01, len(accs_cut))
-            accs_cut_jittered = np.array(accs_cut) + jitter
-            ax2.scatter(folds_cut, accs_cut_jittered, marker='o', s=50,
-                       color='#3274A1', alpha=0.6, edgecolors='black',
-                       linewidth=0.5, label='Baseline (cut)', zorder=3)
-            ax2.plot(folds_cut, accs_cut, color='#3274A1', linewidth=1.5,
-                    alpha=0.3, zorder=1)
-        if my_cut:
-            folds_cut, accs_cut = zip(*my_cut)
-            jitter = np.random.RandomState(45).uniform(-0.01, 0.01, len(accs_cut))
-            accs_cut_jittered = np.array(accs_cut) + jitter
-            ax2.scatter(folds_cut, accs_cut_jittered, marker='s', s=50,
-                       color='#E1812C', alpha=0.6, edgecolors='black',
-                       linewidth=0.5, label='MyModel (cut)', zorder=3)
-            ax2.plot(folds_cut, accs_cut, color='#E1812C', linewidth=1.5,
-                    alpha=0.3, zorder=1)
-
-        ax2.axhline(0.5, color='red', linestyle='--', linewidth=1.5, alpha=0.5)
-        ax2.set_xlabel('Fold (cut plants)', fontsize=10, fontweight='bold')
-        ax2.set_ylabel('Accuracy', fontsize=10, fontweight='bold')
-        ax2.set_title(f'{task_label}\nFold-wise Accuracy (Cut)', fontsize=11, fontweight='bold')
-        ax2.legend(fontsize=8)
-        ax2.set_ylim(-0.05, 1.08)
-        ax2.grid(True, alpha=0.3)
-
-        # ===== Option 2: Class-wise accuracy bar chart =====
-        ax3 = plt.subplot(4, 4, row_offset + 3)
 
         base_dry_acc = np.mean([a for _, a in base_dry]) if base_dry else 0
         base_cut_acc = np.mean([a for _, a in base_cut]) if base_cut else 0
@@ -893,28 +940,52 @@ def plot_single_class_fold_analysis(fig_root: Path, exp_root: Path):
         base_yerr_clipped = np.minimum(base_yerr, 1.0 - base_means_arr)
         my_yerr_clipped = np.minimum(my_yerr, 1.0 - my_means_arr)
 
-        ax3.bar(x - width/2, [base_dry_acc, base_cut_acc], width,
+        ax.bar(x - width/2, [base_dry_acc, base_cut_acc], width,
                yerr=base_yerr_clipped, capsize=5,
                color='#3274A1', label='Baseline', edgecolor='black',
                linewidth=1.2, alpha=0.85,
                error_kw={"linewidth": 2, "ecolor": "black", "capthick": 2})
-        ax3.bar(x + width/2, [my_dry_acc, my_cut_acc], width,
+        ax.bar(x + width/2, [my_dry_acc, my_cut_acc], width,
                yerr=my_yerr_clipped, capsize=5,
                color='#E1812C', label='MyModel', edgecolor='black',
                linewidth=1.2, alpha=0.85,
                error_kw={"linewidth": 2, "ecolor": "black", "capthick": 2})
 
-        ax3.axhline(0.5, color='red', linestyle='--', linewidth=1.5, alpha=0.5)
-        ax3.set_xticks(x)
-        ax3.set_xticklabels(['Dry samples', 'Cut samples'], fontsize=10, fontweight='bold')
-        ax3.set_ylabel('Mean Accuracy', fontsize=10, fontweight='bold')
-        ax3.set_title(f'{task_label}\nClass-wise Accuracy', fontsize=11, fontweight='bold')
-        ax3.legend(fontsize=8)
-        ax3.set_ylim(0.4, 1.02)
-        ax3.grid(True, alpha=0.3, axis='y')
+        ax.axhline(0.5, color='red', linestyle='--', linewidth=1.5, alpha=0.5)
+        ax.set_xticks(x)
+        ax.set_xticklabels(['Dry samples', 'Cut samples'], fontsize=11, fontweight='bold')
+        ax.set_ylabel('Mean Accuracy', fontsize=11, fontweight='bold')
+        ax.set_title(f'{task_label}\nClass-wise Accuracy', fontsize=12, fontweight='bold')
+        ax.legend(fontsize=9)
+        ax.set_ylim(0.4, 1.02)
+        ax.grid(True, alpha=0.3, axis='y')
 
-        # ===== Option 4: Sequential plot with condition colors =====
-        ax4 = plt.subplot(4, 4, row_offset + 4)
+    fig.suptitle('Class-wise Accuracy: Dry vs Cut',
+                fontsize=15, fontweight='bold', y=0.98)
+    fig.tight_layout(rect=[0, 0.01, 1, 0.95])
+    fig.savefig(fig_root / "task1_classwise_accuracy_bar.png", dpi=300, bbox_inches="tight")
+    print(f"Saved: {fig_root / 'task1_classwise_accuracy_bar.png'}")
+
+
+def plot_sequential_performance(fig_root: Path, exp_root: Path):
+    """Plot sequential performance with condition colors"""
+    tasks = [
+        ("task1_tomato_dry_vs_cut", "Tomato dry vs cut"),
+        ("task1_tobacco_dry_vs_cut", "Tobacco dry vs cut"),
+    ]
+
+    fig, axes = plt.subplots(1, 2, figsize=(14, 5))
+
+    for task_idx, (task_name, task_label) in enumerate(tasks):
+        ax = axes[task_idx]
+
+        # Load data
+        base_data = load_fold_level_data_with_metadata(exp_root, task_name, "baseline")
+        my_data = load_fold_level_data_with_metadata(exp_root, task_name, "mymodel")
+
+        if not base_data or not my_data:
+            print(f"[WARN] No data for {task_name}, skipping visualization")
+            continue
 
         # Plot all folds in order, colored by condition
         all_base = sorted(base_data, key=lambda x: x[0])
@@ -929,7 +1000,7 @@ def plot_single_class_fold_analysis(fig_root: Path, exp_root: Path):
             # Add small horizontal jitter and vertical jitter
             fold_jitter = fold + rng_base.uniform(-0.2, 0.0)
             acc_jitter = acc + rng_base.uniform(-0.01, 0.01)
-            ax4.scatter(fold_jitter, acc_jitter, s=60, c=color, edgecolors='#3274A1',
+            ax.scatter(fold_jitter, acc_jitter, s=60, c=color, edgecolors='#3274A1',
                        linewidth=1.2, alpha=0.7, marker='o', zorder=3)
 
         for i, (fold, acc, pid, cond) in enumerate(all_my):
@@ -937,7 +1008,7 @@ def plot_single_class_fold_analysis(fig_root: Path, exp_root: Path):
             # Add small horizontal jitter (opposite direction) and vertical jitter
             fold_jitter = fold + rng_my.uniform(0.0, 0.2)
             acc_jitter = acc + rng_my.uniform(-0.01, 0.01)
-            ax4.scatter(fold_jitter, acc_jitter, s=60, c=color, edgecolors='#E1812C',
+            ax.scatter(fold_jitter, acc_jitter, s=60, c=color, edgecolors='#E1812C',
                        linewidth=1.2, alpha=0.7, marker='s', zorder=3)
 
         # Create custom legend
@@ -948,20 +1019,20 @@ def plot_single_class_fold_analysis(fig_root: Path, exp_root: Path):
             Patch(facecolor='#FFD700', edgecolor='#E1812C', label='MyModel (dry)'),
             Patch(facecolor='#FF8C00', edgecolor='#E1812C', label='MyModel (cut)'),
         ]
-        ax4.legend(handles=legend_elements, fontsize=7, loc='lower right')
+        ax.legend(handles=legend_elements, fontsize=8, loc='lower right')
 
-        ax4.axhline(0.5, color='red', linestyle='--', linewidth=1.5, alpha=0.5)
-        ax4.set_xlabel('Fold (Plant ID)', fontsize=10, fontweight='bold')
-        ax4.set_ylabel('Accuracy', fontsize=10, fontweight='bold')
-        ax4.set_title(f'{task_label}\nSequential Performance', fontsize=11, fontweight='bold')
-        ax4.set_ylim(-0.05, 1.08)
-        ax4.grid(True, alpha=0.3)
+        ax.axhline(0.5, color='red', linestyle='--', linewidth=1.5, alpha=0.5)
+        ax.set_xlabel('Fold (Plant ID)', fontsize=11, fontweight='bold')
+        ax.set_ylabel('Accuracy', fontsize=11, fontweight='bold')
+        ax.set_title(f'{task_label}\nSequential Performance', fontsize=12, fontweight='bold')
+        ax.set_ylim(-0.05, 1.08)
+        ax.grid(True, alpha=0.3)
 
-    fig.suptitle('Single-Class Fold Analysis: Dry vs Cut Tasks',
-                fontsize=18, fontweight='bold', y=0.995)
-    fig.tight_layout(rect=[0, 0.01, 1, 0.99])
-    fig.savefig(fig_root / "task1_single_class_fold_analysis.png", dpi=300, bbox_inches="tight")
-    print(f"Saved: {fig_root / 'task1_single_class_fold_analysis.png'}")
+    fig.suptitle('Sequential Performance by Condition',
+                fontsize=15, fontweight='bold', y=0.98)
+    fig.tight_layout(rect=[0, 0.01, 1, 0.95])
+    fig.savefig(fig_root / "task1_sequential_performance.png", dpi=300, bbox_inches="tight")
+    print(f"Saved: {fig_root / 'task1_sequential_performance.png'}")
 
 
 def plot_per_plant_heatmap(fig_root: Path, exp_root: Path):
@@ -1063,19 +1134,27 @@ def main():
     t2, t3 = load_task23_results(exp_root)
     plot_task23_bar(fig_root, t2, t3)
 
-    # Confusion matrices
-    base_cm1, my_cm1 = compute_confusions_task1(exp_root)
-    plot_confusions_task1(fig_root, base_cm1, my_cm1)
-
-    base_cm23, my_cm23 = compute_confusions_task23(exp_root)
-    plot_confusions_task23(fig_root, base_cm23, my_cm23)
-
     # Paired scatter
     plot_task1_paired_scatter(fig_root, t1_base, t1_my)
     plot_task23_paired_scatter(fig_root, t2, t3)
 
-    # Single-class fold analysis (dry vs cut tasks)
-    plot_single_class_fold_analysis(fig_root, exp_root)
+    # Single-class fold analysis (dry vs cut tasks) - individual plots
+    # Generate these first as they only need CSV results, not raw data
+    print("Generating individual single-class fold analysis plots...")
+    plot_fold_accuracy_dry(fig_root, exp_root)
+    plot_fold_accuracy_cut(fig_root, exp_root)
+    plot_classwise_accuracy_bar(fig_root, exp_root)
+    plot_sequential_performance(fig_root, exp_root)
+
+    # Confusion matrices (requires raw data, may fail if not available)
+    try:
+        base_cm1, my_cm1 = compute_confusions_task1(exp_root)
+        plot_confusions_task1(fig_root, base_cm1, my_cm1)
+
+        base_cm23, my_cm23 = compute_confusions_task23(exp_root)
+        plot_confusions_task23(fig_root, base_cm23, my_cm23)
+    except FileNotFoundError as e:
+        print(f"[WARN] Skipping confusion matrices (raw data not available): {e}")
 
     print(f"Figures saved to: {fig_root}")
 
