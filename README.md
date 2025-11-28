@@ -209,25 +209,17 @@ data/raw/PlantSounds/
 
 ---
 
-#### Task 1 Summary Visualizations
+#### Task 1 Results Visualization
 
 ![Task 1 Bar Chart](experiments/figures/task1_balanced_accuracy_bar.png)
-**Figure 1a**: Comparison of balanced accuracy across all 4 Task 1 experiments. Shows Baseline CNN, MyModel with full labels, and MyModel with 50% labels. Error bars indicate cross-validation standard deviation.
 
 ![Task 1 Dry vs Cut Analysis](experiments/figures/task1_single_class_fold_analysis.png)
-**Figure 1b**: Detailed analysis of Tasks 1.1 and 1.2 (dry vs cut classification). Shows fold-wise accuracy for each plant individual, demonstrating the single-class fold challenge and per-condition performance breakdown.
 
 ![Task 1 Boxplot](experiments/figures/task1_balanced_accuracy_boxplot.png)
-**Figure 1c**: Distribution of fold-wise accuracies for all 4 tasks. Boxes show IQR, red lines indicate median, whiskers extend to 1.5×IQR. Note the perfect scores (all 1.0) for tobacco dry vs cut with MyModel.
 
 ![Task 1 Paired Scatter](experiments/figures/task1_paired_scatter.png)
-**Figure 1d**: Fold-by-fold comparison between Baseline and MyModel. Each point represents one LOPO fold. Points above the diagonal (y=x line) indicate MyModel outperforms Baseline for that fold.
 
 ![Task 1 Confusion Matrices](experiments/figures/task1_confusion_matrices.png)
-**Figure 1e**: Confusion matrices pooled across all LOPO folds. Shows true positive, false positive, true negative, and false negative counts. Note: Some tasks show "N/A" because each fold contained only one class (single-class fold problem).
-
-![Task 1 Per-Plant Heatmap](experiments/figures/task1_per_plant_heatmap.png)
-**Figure 1f**: Per-plant performance heatmap for Tasks 1.1 and 1.2. Each cell represents the accuracy when that specific plant was used as the test set, colored by performance level.
 
 ---
 
@@ -286,16 +278,13 @@ data/raw/PlantSounds/
 
 ---
 
-### Task 2 & 3 Visualizations
+### Task 2 & 3 Results Visualization
 
 ![Task 2/3 Bar Chart](experiments/figures/task2_task3_balanced_accuracy_bar.png)
-**Figure 2a**: Comparison of balanced accuracy for Tasks 2 and 3. Both tasks achieve >95% accuracy, demonstrating robust plant vs noise discrimination.
 
 ![Task 2/3 Paired Scatter](experiments/figures/task2_task3_paired_scatter.png)
-**Figure 2b**: Fold-by-fold comparison between Baseline and MyModel for Tasks 2 and 3. Most points cluster near perfect performance (top-right corner), with minimal variation across folds.
 
 ![Task 2/3 Confusion Matrices](experiments/figures/task2_task3_confusion_matrices.png)
-**Figure 2c**: Confusion matrices pooled across all LOPO folds. Shows very few misclassification errors, confirming strong discriminability between plant sounds and noise.
 
 ---
 
@@ -338,10 +327,9 @@ data/raw/PlantSounds/
 
 ---
 
-### Task 4 Visualization
+### Task 4 Results Visualization
 
 ![Task 4 Label Fraction Effect](experiments/figures/task4_label_fraction_effect.png)
-**Figure 4**: Semi-supervised learning effect across all 4 Task 1 experiments. Each subplot shows performance trajectory from 50% to 100% labels (orange line with error bars). Baseline performance (blue dashed line) and chance level (red dotted line) are shown for reference. Note the minimal performance drop and strong retention of accuracy with reduced labels.
 
 ---
 
@@ -795,25 +783,17 @@ data/raw/PlantSounds/
 
 ---
 
-#### Task 1 요약 시각화
+#### Task 1 결과 시각화
 
 ![Task 1 막대 그래프](experiments/figures/task1_balanced_accuracy_bar.png)
-**그림 1a**: 4개 Task 1 실험의 균형 정확도 비교. Baseline CNN, 전체 라벨 MyModel, 50% 라벨 MyModel을 보여줍니다. 오차 막대는 교차 검증 표준 편차를 나타냅니다.
 
 ![Task 1 Dry vs Cut 분석](experiments/figures/task1_single_class_fold_analysis.png)
-**그림 1b**: Task 1.1과 1.2 (dry vs cut 분류)의 상세 분석. 각 개별 식물에 대한 fold별 정확도를 보여주며, 단일 클래스 fold 문제와 조건별 성능 분석을 나타냅니다.
 
 ![Task 1 박스플롯](experiments/figures/task1_balanced_accuracy_boxplot.png)
-**그림 1c**: 4개 작업 모두의 fold별 정확도 분포. 상자는 IQR을 나타내고, 빨간 선은 중앙값, 수염은 1.5×IQR까지 확장됩니다. MyModel의 담배 dry vs cut에서 완벽한 점수(모두 1.0)를 확인하세요.
 
 ![Task 1 쌍별 산점도](experiments/figures/task1_paired_scatter.png)
-**그림 1d**: Baseline과 MyModel 간의 fold별 비교. 각 점은 하나의 LOPO fold를 나타냅니다. 대각선(y=x) 위의 점은 해당 fold에서 MyModel이 Baseline을 능가함을 나타냅니다.
 
 ![Task 1 혼동 행렬](experiments/figures/task1_confusion_matrices.png)
-**그림 1e**: 모든 LOPO fold에 걸쳐 풀링된 혼동 행렬. 참 양성, 거짓 양성, 참 음성, 거짓 음성 개수를 보여줍니다. 참고: 일부 작업은 각 fold에 하나의 클래스만 포함되어 "N/A"로 표시됩니다(단일 클래스 fold 문제).
-
-![Task 1 식물별 히트맵](experiments/figures/task1_per_plant_heatmap.png)
-**그림 1f**: Task 1.1과 1.2의 식물별 성능 히트맵. 각 셀은 특정 식물이 테스트 세트로 사용될 때의 정확도를 나타내며, 성능 수준에 따라 색상이 지정됩니다.
 
 ---
 
@@ -872,16 +852,13 @@ data/raw/PlantSounds/
 
 ---
 
-### Task 2 & 3 시각화
+### Task 2 & 3 결과 시각화
 
 ![Task 2/3 막대 그래프](experiments/figures/task2_task3_balanced_accuracy_bar.png)
-**그림 2a**: Task 2와 3의 균형 정확도 비교. 두 작업 모두 >95% 정확도를 달성하여 강력한 식물 vs 소음 구별을 보여줍니다.
 
 ![Task 2/3 쌍별 산점도](experiments/figures/task2_task3_paired_scatter.png)
-**그림 2b**: Task 2와 3에 대한 Baseline과 MyModel 간의 fold별 비교. 대부분의 점이 완벽한 성능(오른쪽 상단 모서리) 근처에 밀집되어 있으며, fold 간 변동이 최소화됩니다.
 
 ![Task 2/3 혼동 행렬](experiments/figures/task2_task3_confusion_matrices.png)
-**그림 2c**: 모든 LOPO fold에 걸쳐 풀링된 혼동 행렬. 매우 적은 오분류 오류를 보여주며, 식물 소리와 소음 간의 강력한 구별력을 확인합니다.
 
 ---
 
@@ -924,10 +901,9 @@ data/raw/PlantSounds/
 
 ---
 
-### Task 4 시각화
+### Task 4 결과 시각화
 
 ![Task 4 라벨 비율 효과](experiments/figures/task4_label_fraction_effect.png)
-**그림 4**: 4개 Task 1 실험의 반지도 학습 효과. 각 서브플롯은 50%에서 100% 라벨로의 성능 궤적(오차 막대가 있는 주황색 선)을 보여줍니다. 참고로 Baseline 성능(파란 점선)과 우연 수준(빨간 점선)이 표시됩니다. 감소된 라벨로의 최소 성능 저하와 강력한 정확도 유지에 주목하세요.
 
 ---
 
