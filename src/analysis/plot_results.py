@@ -6,7 +6,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
-from src.training.common import get_project_paths
+from src.training.common import get_project_paths, compute_binary_metrics
 from src.datasets.plantsounds import (
     scan_plantsounds,
     make_task_lopo_splits,
@@ -336,65 +336,108 @@ def plot_task23_bar(fig_root: Path, t2, t3):
 # ---------------------------------------------------------
 def plot_task4_semi_effect(fig_root: Path, baseline, my_full, my_semi):
     """
-    Visualize semi-supervised learning effect with a simple line graph
+    Clear grouped bar chart showing semi-supervised learning effect.
+    Compares Baseline vs MyModel (50% labels) vs MyModel (100% labels) across all tasks.
     """
-    fig, axes = plt.subplots(2, 2, figsize=(14, 10))
-    axes = axes.reshape(-1)
+    fig, ax = plt.subplots(figsize=(16, 8))
 
-    colors = ["#3274A1", "#E1812C", "#3A923A"]
+    # Colors
+    baseline_color = "#5D6D7E"      # Gray
+    semi_color = "#F39C12"          # Orange
+    full_color = "#27AE60"          # Green
 
-    for idx, key in enumerate(TASK1_KEYS):
-        ax = axes[idx]
+    # Prepare data
+    tasks = TASK1_LABELS
+    n_tasks = len(tasks)
 
-        # Prepare data
-        label_fractions = [50, 100]
+    baseline_means = [baseline[key]["mean_bal"] for key in TASK1_KEYS]
+    semi_means = [my_semi[key]["mean_bal"] for key in TASK1_KEYS]
+    full_means = [my_full[key]["mean_bal"] for key in TASK1_KEYS]
 
-        base_mean = baseline[key]["mean_bal"]
-        full_mean = my_full[key]["mean_bal"]
-        semi_mean = my_semi[key]["mean_bal"]
+    baseline_stds = [baseline[key]["std_bal"] for key in TASK1_KEYS]
+    semi_stds = [my_semi[key]["std_bal"] for key in TASK1_KEYS]
+    full_stds = [my_full[key]["std_bal"] for key in TASK1_KEYS]
 
-        full_std = my_full[key]["std_bal"]
-        semi_std = my_semi[key]["std_bal"]
+    # Bar positions
+    x = np.arange(n_tasks)
+    width = 0.25
 
-        # Baseline horizontal line
-        ax.axhline(base_mean, color=colors[0], linestyle='--',
-                  linewidth=2, alpha=0.7, label='Baseline', zorder=1)
+    # Create bars
+    bars1 = ax.bar(x - width, baseline_means, width,
+                   yerr=baseline_stds, capsize=5,
+                   label='Baseline CNN', color=baseline_color,
+                   edgecolor='black', linewidth=1.2, alpha=0.85,
+                   error_kw={'linewidth': 2, 'ecolor': 'black', 'capthick': 2})
 
-        # MyModel: 50% -> 100% label
-        mymodel_means = [semi_mean, full_mean]
-        mymodel_stds = [semi_std, full_std]
+    bars2 = ax.bar(x, semi_means, width,
+                   yerr=semi_stds, capsize=5,
+                   label='MyModel (50% labels)', color=semi_color,
+                   edgecolor='black', linewidth=1.2, alpha=0.85,
+                   error_kw={'linewidth': 2, 'ecolor': 'black', 'capthick': 2})
 
-        # Line plot with error bars
-        ax.errorbar(label_fractions, mymodel_means,
-                   yerr=mymodel_stds,
-                   color=colors[1], linewidth=2.5, marker='o', markersize=8,
-                   capsize=6, capthick=2, elinewidth=2,
-                   label='MyModel', alpha=0.9, zorder=3)
+    bars3 = ax.bar(x + width, full_means, width,
+                   yerr=full_stds, capsize=5,
+                   label='MyModel (100% labels)', color=full_color,
+                   edgecolor='black', linewidth=1.2, alpha=0.85,
+                   error_kw={'linewidth': 2, 'ecolor': 'black', 'capthick': 2})
 
-        # Display values (simple)
-        ax.text(50, semi_mean - 0.05, f'{semi_mean:.3f}',
-               ha='center', va='top', fontsize=9, color=colors[1])
-        ax.text(100, full_mean + 0.03, f'{full_mean:.3f}',
-               ha='center', va='bottom', fontsize=9, color=colors[1])
+    # Add value labels on bars
+    def add_value_labels(bars, values):
+        for bar, value in zip(bars, values):
+            height = bar.get_height()
+            ax.text(bar.get_x() + bar.get_width()/2., height + 0.02,
+                   f'{value:.3f}',
+                   ha='center', va='bottom', fontsize=9, fontweight='bold')
 
-        # Chance level
-        ax.axhline(0.5, color='red', linestyle=':', linewidth=1.5,
-                  alpha=0.5, label='Chance', zorder=0)
+    add_value_labels(bars1, baseline_means)
+    add_value_labels(bars2, semi_means)
+    add_value_labels(bars3, full_means)
 
-        ax.set_xlabel('Label Fraction (%)', fontsize=11, fontweight='bold')
-        ax.set_ylabel('Balanced Accuracy', fontsize=11, fontweight='bold')
-        ax.set_title(TASK1_LABELS[idx], fontsize=12, fontweight='bold', pad=10)
-        ax.set_xlim(40, 110)
-        ax.set_ylim(0.5, 1.05)
-        ax.set_xticks([50, 100])
-        ax.set_xticklabels(['50%', '100%'])
-        ax.grid(True, alpha=0.3, linestyle='--')
-        ax.legend(loc='lower right', fontsize=9)
+    # Add improvement annotations (50% -> 100%)
+    for i, (semi, full) in enumerate(zip(semi_means, full_means)):
+        improvement = full - semi
+        if improvement > 0.005:  # Only show if meaningful
+            # Arrow from 50% to 100%
+            arrow_y = max(semi, full) + 0.08
+            ax.annotate('', xy=(x[i] + width, arrow_y),
+                       xytext=(x[i], arrow_y),
+                       arrowprops=dict(arrowstyle='->', lw=2, color='#E74C3C'))
 
-    fig.suptitle('Task4: Semi-Supervised Learning Effect',
-                fontsize=15, fontweight='bold', y=0.995)
-    fig.tight_layout(rect=[0, 0.01, 1, 0.98])
+            # Improvement text
+            ax.text(x[i] + width/2, arrow_y + 0.02,
+                   f'+{improvement:.3f}', ha='center', va='bottom',
+                   fontsize=9, fontweight='bold', color='#E74C3C',
+                   bbox=dict(boxstyle='round,pad=0.3', facecolor='#FADBD8',
+                            edgecolor='#E74C3C', linewidth=1.5))
+
+    # Chance level reference
+    ax.axhline(0.5, color='red', linestyle=':', linewidth=2, alpha=0.5,
+              label='Chance level', zorder=0)
+
+    # Styling
+    ax.set_xlabel('Task', fontsize=14, fontweight='bold')
+    ax.set_ylabel('Balanced Accuracy', fontsize=14, fontweight='bold')
+    ax.set_title('Semi-Supervised Learning Effect: Impact of Label Fraction on Performance',
+                fontsize=16, fontweight='bold', pad=20)
+
+    ax.set_xticks(x)
+    ax.set_xticklabels(tasks, fontsize=12, fontweight='bold')
+    ax.set_ylim(0.45, 1.15)
+
+    # Grid
+    ax.grid(True, axis='y', alpha=0.3, linestyle='--', linewidth=1)
+    ax.set_axisbelow(True)
+
+    # Legend
+    ax.legend(loc='upper left', fontsize=12, framealpha=0.95,
+             edgecolor='black', fancybox=True, ncol=2)
+
+    # Background
+    ax.set_facecolor('#FAFAFA')
+
+    fig.tight_layout()
     fig.savefig(fig_root / "task4_label_fraction_effect.png", dpi=300, bbox_inches="tight")
+    print(f"Saved: {fig_root / 'task4_label_fraction_effect.png'}")
 
 
 # ---------------------------------------------------------
@@ -455,13 +498,26 @@ def reconstruct_confusion_for_model(task_name: str, csv_path: Path) -> np.ndarra
         n_pos = sum(labels)
         n_neg = len(labels) - n_pos
 
-        # If only one class exists, balanced acc is ambiguous → exclude from confusion
+        # Handle single-class folds (common in dry vs cut tasks where each plant has only one stress type)
         if n_pos == 0 or n_neg == 0:
-            continue
-
-        tp, tn = _bruteforce_tp_tn(n_pos, n_neg, acc, bal)
-        fp = n_neg - tn
-        fn = n_pos - tp
+            # Single-class fold: can still compute confusion matrix
+            if n_pos == 0:
+                # All samples are negative (label=0)
+                # Accuracy = TN / n_neg
+                tn = int(round(acc * n_neg))
+                fp = n_neg - tn
+                tp = fn = 0
+            else:
+                # All samples are positive (label=1)
+                # Accuracy = TP / n_pos
+                tp = int(round(acc * n_pos))
+                fn = n_pos - tp
+                tn = fp = 0
+        else:
+            # Both classes present: use bruteforce method
+            tp, tn = _bruteforce_tp_tn(n_pos, n_neg, acc, bal)
+            fp = n_neg - tn
+            fn = n_pos - tp
 
         # rows=true, cols=pred  [ [TN, FP],[FN, TP] ]
         cm[0, 0] += tn
@@ -606,7 +662,7 @@ def plot_confusions_task23(fig_root: Path, base_cm, my_cm):
     keys = ["task2_plant_vs_empty", "task3_tomato_vs_greenhouse"]
     titles = ["Task2: plant vs empty pot", "Task3: tomato vs greenhouse noise"]
 
-    fig, axes = plt.subplots(2, 2, figsize=(9, 5))
+    fig, axes = plt.subplots(2, 2, figsize=(12, 8))
     axes = axes.reshape(2, 2)
 
     for i, key in enumerate(keys):
@@ -623,9 +679,123 @@ def plot_confusions_task23(fig_root: Path, base_cm, my_cm):
             task_name=key,
         )
 
-    fig.suptitle("Task2 / Task3: confusion matrices (LOPO pooled)", fontsize=14)
-    fig.tight_layout(rect=[0, 0.03, 1, 0.95])
-    fig.savefig(fig_root / "task2_task3_confusion_matrices.png", dpi=300)
+    fig.suptitle("Task2 / Task3: confusion matrices (LOPO pooled)", fontsize=14, y=0.98)
+    fig.tight_layout(rect=[0, 0.01, 1, 0.96])
+    fig.savefig(fig_root / "task2_task3_confusion_matrices.png", dpi=300, bbox_inches="tight")
+
+
+def plot_metrics_summary_table(fig_root: Path, exp_root: Path):
+    """
+    Create a clean summary table of all metrics across all tasks.
+    Similar to academic paper tables showing model performance comparison.
+    """
+    try:
+        base_cm1, my_cm1 = compute_confusions_task1(exp_root)
+        base_cm23, my_cm23 = compute_confusions_task23(exp_root)
+    except FileNotFoundError as e:
+        print(f"[WARN] Cannot generate metrics table (raw data not available): {e}")
+        return
+
+    # Define task names
+    task_info = [
+        ("task1_tomato_dry_vs_cut", "Tomato dry vs cut", base_cm1, my_cm1),
+        ("task1_tobacco_dry_vs_cut", "Tobacco dry vs cut", base_cm1, my_cm1),
+        ("task1_dry_tomato_vs_tobacco", "Dry: tomato vs tobacco", base_cm1, my_cm1),
+        ("task1_cut_tomato_vs_tobacco", "Cut: tomato vs tobacco", base_cm1, my_cm1),
+        ("task2_plant_vs_empty", "Plant vs empty pot", base_cm23, my_cm23),
+        ("task3_tomato_vs_greenhouse", "Tomato vs greenhouse", base_cm23, my_cm23),
+    ]
+
+    # Prepare data
+    rows = []
+    for task_key, task_label, base_dict, my_dict in task_info:
+        base_m = compute_binary_metrics(base_dict[task_key])
+        my_m = compute_binary_metrics(my_dict[task_key])
+
+        rows.append({
+            'Task': task_label,
+            'Model': 'Baseline',
+            'Accuracy': base_m['accuracy'],
+            'Bal.Acc': base_m['balanced_accuracy'],
+            'Macro-F1': base_m['macro_f1'],
+            'Precision': base_m['precision'],
+            'Recall': base_m['recall'],
+            'Specificity': base_m['specificity'],
+        })
+
+        rows.append({
+            'Task': task_label,
+            'Model': 'MyModel',
+            'Accuracy': my_m['accuracy'],
+            'Bal.Acc': my_m['balanced_accuracy'],
+            'Macro-F1': my_m['macro_f1'],
+            'Precision': my_m['precision'],
+            'Recall': my_m['recall'],
+            'Specificity': my_m['specificity'],
+        })
+
+    df = pd.DataFrame(rows)
+
+    # Create figure
+    fig, ax = plt.subplots(figsize=(14, 9))
+    ax.axis('tight')
+    ax.axis('off')
+
+    # Format data for display
+    display_data = []
+    for _, row in df.iterrows():
+        display_data.append([
+            row['Task'],
+            row['Model'],
+            f"{row['Accuracy']:.3f}",
+            f"{row['Bal.Acc']:.3f}",
+            f"{row['Macro-F1']:.3f}",
+            f"{row['Precision']:.3f}",
+            f"{row['Recall']:.3f}",
+            f"{row['Specificity']:.3f}",
+        ])
+
+    # Create table
+    table = ax.table(
+        cellText=display_data,
+        colLabels=['Task', 'Model', 'Accuracy', 'Bal.Acc', 'Macro-F1', 'Precision', 'Recall', 'Specificity'],
+        cellLoc='center',
+        loc='center',
+        colWidths=[0.22, 0.11, 0.10, 0.10, 0.11, 0.11, 0.10, 0.11]
+    )
+
+    table.auto_set_font_size(False)
+    table.set_fontsize(9)
+    table.scale(1, 2.2)
+
+    # Style header
+    for i in range(8):
+        cell = table[(0, i)]
+        cell.set_facecolor('#2E5077')
+        cell.set_text_props(weight='bold', color='white', fontsize=10)
+
+    # Style data rows
+    for i in range(1, len(display_data) + 1):
+        model = display_data[i-1][1]
+        for j in range(8):
+            cell = table[(i, j)]
+            if model == 'MyModel':
+                cell.set_facecolor('#E8F4F8')  # Light blue for MyModel
+            elif i % 2 == 1:
+                cell.set_facecolor('#F5F5F5')  # Light gray alternating
+            else:
+                cell.set_facecolor('white')
+
+            # Bold model names
+            if j == 1:
+                cell.set_text_props(weight='bold')
+
+    plt.title('Classification Metrics Summary - All Tasks\n(LOPO Cross-Validation)',
+              fontsize=13, fontweight='bold', pad=20)
+
+    fig.tight_layout()
+    fig.savefig(fig_root / "metrics_summary_table.png", dpi=300, bbox_inches="tight")
+    print(f"Saved: {fig_root / 'metrics_summary_table.png'}")
 
 
 # ---------------------------------------------------------
@@ -1122,41 +1292,81 @@ def plot_per_plant_heatmap(fig_root: Path, exp_root: Path):
 # main
 # ---------------------------------------------------------
 def main():
+    """
+    Streamlined visualization focusing on essential metrics for publication.
+
+    Generated visualizations (6 total):
+    1. Metrics summary table (Accuracy, Bal.Acc, Macro-F1, Precision, Recall, Specificity)
+    2. Task1 confusion matrices (4 tasks including tomato/tobacco dry vs cut)
+    3. Task2/3 confusion matrices (plant vs empty, tomato vs greenhouse)
+    4. Task1 comparison bar plot (Baseline vs MyModel)
+    5. Task2/3 comparison bar plot
+    6. Semi-supervised effect plot (label fraction)
+
+    Removed low-priority visualizations:
+    - Box plots (redundant with bar plots)
+    - Paired scatter plots (too detailed)
+    - Fold-wise accuracy plots (too granular)
+    """
     _, exp_root, fig_root = get_paths()
 
-    # Task1
-    t1_base, t1_my, t1_semi = load_task1_results(exp_root)
-    plot_task1_bar(fig_root, t1_base, t1_my, t1_semi)
-    plot_task1_box(fig_root, t1_base, t1_my)
-    plot_task4_semi_effect(fig_root, t1_base, t1_my, t1_semi)
+    print("=" * 70)
+    print("GENERATING ESSENTIAL VISUALIZATIONS FOR PUBLICATION")
+    print("=" * 70)
 
-    # Task2 / Task3
-    t2, t3 = load_task23_results(exp_root)
-    plot_task23_bar(fig_root, t2, t3)
+    # ========== METRICS SUMMARY TABLE (MOST IMPORTANT) ==========
+    print("\n[1/4] Metrics summary table...")
+    print("      (Accuracy, Bal.Acc, Macro-F1, Precision, Recall, Specificity)")
 
-    # Paired scatter
-    plot_task1_paired_scatter(fig_root, t1_base, t1_my)
-    plot_task23_paired_scatter(fig_root, t2, t3)
+    try:
+        plot_metrics_summary_table(fig_root, exp_root)
+        print("      ✓ Table generated")
+    except Exception as e:
+        print(f"      [WARN] Failed: {e}")
 
-    # Single-class fold analysis (dry vs cut tasks) - individual plots
-    # Generate these first as they only need CSV results, not raw data
-    print("Generating individual single-class fold analysis plots...")
-    plot_fold_accuracy_dry(fig_root, exp_root)
-    plot_fold_accuracy_cut(fig_root, exp_root)
-    plot_classwise_accuracy_bar(fig_root, exp_root)
-    plot_sequential_performance(fig_root, exp_root)
+    # ========== CONFUSION MATRICES ==========
+    print("\n[2/4] Confusion matrices...")
+    print("      (All 6 tasks including tomato/tobacco dry vs cut)")
 
-    # Confusion matrices (requires raw data, may fail if not available)
     try:
         base_cm1, my_cm1 = compute_confusions_task1(exp_root)
         plot_confusions_task1(fig_root, base_cm1, my_cm1)
 
         base_cm23, my_cm23 = compute_confusions_task23(exp_root)
         plot_confusions_task23(fig_root, base_cm23, my_cm23)
-    except FileNotFoundError as e:
-        print(f"[WARN] Skipping confusion matrices (raw data not available): {e}")
 
-    print(f"Figures saved to: {fig_root}")
+        print("      ✓ Confusion matrices generated")
+    except FileNotFoundError as e:
+        print(f"      [WARN] Skipping (raw data not available)")
+
+    # ========== TASK COMPARISON BAR PLOTS ==========
+    print("\n[3/4] Task comparison bar plots...")
+
+    t1_base, t1_my, t1_semi = load_task1_results(exp_root)
+    plot_task1_bar(fig_root, t1_base, t1_my, t1_semi)
+
+    t2, t3 = load_task23_results(exp_root)
+    plot_task23_bar(fig_root, t2, t3)
+
+    print("      ✓ Bar plots generated")
+
+    # ========== SEMI-SUPERVISED EFFECT ==========
+    print("\n[4/4] Semi-supervised effect...")
+
+    plot_task4_semi_effect(fig_root, t1_base, t1_my, t1_semi)
+
+    print("      ✓ Semi-supervised plot generated")
+
+    print("\n" + "=" * 70)
+    print("ESSENTIAL FIGURES SAVED:")
+    print("  1. metrics_summary_table.png")
+    print("  2. task1_confusion_matrices.png")
+    print("  3. task2_task3_confusion_matrices.png")
+    print("  4. task1_balanced_accuracy_bar.png")
+    print("  5. task2_task3_balanced_accuracy_bar.png")
+    print("  6. task4_label_fraction_effect.png")
+    print(f"\nLocation: {fig_root}")
+    print("=" * 70)
 
 
 if __name__ == "__main__":

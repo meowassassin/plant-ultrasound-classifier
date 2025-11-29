@@ -174,6 +174,89 @@ def evaluate(
     return avg_loss, acc, bal_acc
 
 
+def compute_binary_metrics(conf_matrix: np.ndarray) -> dict:
+    """
+    Compute comprehensive binary classification metrics from confusion matrix.
+
+    Args:
+        conf_matrix: 2x2 confusion matrix where conf_matrix[i,j] is count of
+                    samples with true label i predicted as j
+
+    Returns:
+        Dictionary containing:
+            - accuracy: Overall accuracy (TP+TN)/(TP+TN+FP+FN)
+            - balanced_accuracy: (TPR + TNR) / 2
+            - precision: TP / (TP + FP) - How reliable are positive predictions
+            - recall (sensitivity, TPR): TP / (TP + FN) - How many positives are caught
+            - specificity (TNR): TN / (TN + FP) - How well negatives are identified
+            - f1_score: 2 * (Precision * Recall) / (Precision + Recall)
+            - fpr: FP / (FP + TN) - False positive rate
+            - fnr: FN / (FN + TP) - False negative rate
+    """
+    assert conf_matrix.shape == (2, 2), "Confusion matrix must be 2x2 for binary classification"
+
+    tn = conf_matrix[0, 0]  # True Negative
+    fp = conf_matrix[0, 1]  # False Positive
+    fn = conf_matrix[1, 0]  # False Negative
+    tp = conf_matrix[1, 1]  # True Positive
+
+    total = tp + tn + fp + fn
+
+    # Basic metrics
+    accuracy = (tp + tn) / total if total > 0 else 0.0
+
+    # Precision = TP / (TP + FP) - "양성이라고 예측한 것 중 진짜 양성 비율"
+    precision = tp / (tp + fp) if (tp + fp) > 0 else 0.0
+
+    # Recall (Sensitivity, TPR) = TP / (TP + FN) - "실제 양성 중 찾아낸 비율"
+    recall = tp / (tp + fn) if (tp + fn) > 0 else 0.0
+
+    # Specificity (TNR) = TN / (TN + FP) - "실제 음성 중 제대로 음성이라고 한 비율"
+    specificity = tn / (tn + fp) if (tn + fp) > 0 else 0.0
+
+    # Balanced Accuracy = (TPR + TNR) / 2
+    balanced_accuracy = (recall + specificity) / 2.0
+
+    # F1-Score = 2 * (Precision * Recall) / (Precision + Recall)
+    # This is F1 for positive class (class 1)
+    f1_score = 2 * (precision * recall) / (precision + recall) if (precision + recall) > 0 else 0.0
+
+    # Per-class F1 scores for Macro F1
+    # Class 0 (negative): precision_0 = TN/(TN+FN), recall_0 = TN/(TN+FP)
+    precision_0 = tn / (tn + fn) if (tn + fn) > 0 else 0.0
+    recall_0 = tn / (tn + fp) if (tn + fp) > 0 else 0.0
+    f1_class0 = 2 * (precision_0 * recall_0) / (precision_0 + recall_0) if (precision_0 + recall_0) > 0 else 0.0
+
+    # Class 1 (positive): same as f1_score above
+    f1_class1 = f1_score
+
+    # Macro F1 = average of per-class F1 scores
+    macro_f1 = (f1_class0 + f1_class1) / 2.0
+
+    # False Positive Rate = FP / (FP + TN)
+    fpr = fp / (fp + tn) if (fp + tn) > 0 else 0.0
+
+    # False Negative Rate = FN / (FN + TP)
+    fnr = fn / (fn + tp) if (fn + tp) > 0 else 0.0
+
+    return {
+        'accuracy': float(accuracy),
+        'balanced_accuracy': float(balanced_accuracy),
+        'precision': float(precision),
+        'recall': float(recall),
+        'sensitivity': float(recall),  # Alias for recall
+        'specificity': float(specificity),
+        'f1_score': float(f1_score),
+        'macro_f1': float(macro_f1),
+        'fpr': float(fpr),
+        'fnr': float(fnr),
+        'tp': int(tp),
+        'tn': int(tn),
+        'fp': int(fp),
+        'fn': int(fn),
+    }
+
+
 def get_project_paths() -> Tuple[Path, Path]:
     """
     (project_root, plantsounds_root)를 반환.

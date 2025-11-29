@@ -1,9 +1,3 @@
-# Plant Sound Classification with Deep Learning
-
-**English** | [한국어](#한국어-버전)
-
----
-
 ## Working Environment
 
 - **Python**: 3.8+
@@ -121,6 +115,136 @@ data/raw/PlantSounds/
 
 ---
 
+## Model Architecture
+
+### Baseline CNN (Khait et al., 2023)
+
+![Baseline](experiments/figures/baseline_architecture.svg)
+
+### MyModel (Baseline CNN + VAE + SSL + DG)
+
+![MyModel](experiments/figures/mymodel_architecture.svg)
+
+**Architecture Details**:
+
+- **Backbone**: Identical CNN structure to Baseline (Khait et al., 2023)
+- **Embedding h**: 128-dimensional feature representation from CNN backbone
+- **Main Classifier**: h → binary logit (BCEWithLogitsLoss)
+- **VAE Module**:
+  - Encoder: h → (μ, log σ²) in 32-dim latent space
+  - Reparameterization: z = μ + σ ⊙ ε
+  - Decoder: z → h_reconstructed
+  - Loss: MSE(h, h_rec) + β·KL(q(z|h) || N(0, I))
+- **SSL (Semi-Supervised Learning)**:
+  - Consistency regularization between z(x) and z(x_augmented)
+  - Enables learning from unlabeled data (50% label experiments)
+- **DG (Domain Generalization)**:
+  - Domain classifier head: h → domain logits
+  - Improves robustness across recording conditions
+
+---
+
+## Training Protocol
+
+### Data Preprocessing
+
+1. **Resampling**: All audio to 500 kHz
+2. **Segmentation**: 2ms windows (1000 samples)
+3. **High-pass Filter**: Remove low-frequency noise
+4. **Normalization**: Zero mean, unit variance
+
+### Cross-Validation
+
+**LOPO (Leave-One-Plant-Out)**:
+- Each fold holds out all recordings from one plant
+- Tests generalization to new individuals
+- More realistic evaluation than random splits
+
+### Training Configuration
+
+```python
+Optimizer: Adam (lr=5e-4)
+Loss: BCEWithLogitsLoss (with class balancing)
+Batch size: 64
+Epochs: 10 (with early stopping)
+```
+
+### Evaluation Metrics
+
+This project uses multiple classification metrics to provide comprehensive performance assessment:
+
+#### Primary Metrics
+
+##### 1. Balanced Accuracy (Main metric for this project)
+
+- Formula: `(Recall + Specificity) / 2 = (TPR + TNR) / 2`
+- **Why we use it**: Our plant stress datasets have class imbalance (especially in LOPO where each fold may test only one plant with one stress condition). Balanced accuracy treats both classes equally by averaging per-class recalls, making it more reliable than regular accuracy for imbalanced data.
+- **Interpretation**: Perfect score = 1.0, Random guessing = 0.5
+
+##### 2. Accuracy
+
+- Formula: `(TP + TN) / (TP + TN + FP + FN)`
+- Total correct predictions over all samples
+- **Limitation**: Can be misleading with class imbalance (e.g., predicting all samples as one class could give high accuracy)
+
+#### Additional Important Metrics
+
+##### 3. Precision (Positive Predictive Value)
+
+- Formula: `TP / (TP + FP)`
+- "Of all samples predicted as positive, how many are truly positive?"
+- **Use case**: Important when false alarms (FP) are costly
+- High precision = Reliable positive predictions
+
+##### 4. Recall (Sensitivity, True Positive Rate)
+
+- Formula: `TP / (TP + FN)`
+- "Of all actual positive samples, how many did we correctly identify?"
+- **Use case**: Important when missing positives (FN) is costly
+- High recall = Finding most/all actual positive cases
+
+##### 5. Specificity (True Negative Rate)
+
+- Formula: `TN / (TN + FP)`
+- "Of all actual negative samples, how many did we correctly identify?"
+- Measures how well the model identifies negative class
+
+##### 6. F1-Score
+
+- Formula: `2 × (Precision × Recall) / (Precision + Recall)`
+- Harmonic mean of precision and recall
+- **Use case**: When you need balanced precision and recall
+- If either precision or recall is low, F1-score will also be low
+
+#### Understanding the Confusion Matrix
+
+```
+                  Predicted
+              Negative   Positive
+Actual  Neg      TN        FP      ← False Positive: Wrong alarm
+        Pos      FN        TP      ← False Negative: Missed detection
+                 ↑
+            Missed case
+```
+
+- **TP (True Positive)**: Correctly predicted positive (e.g., correctly identified stressed plant)
+- **TN (True Negative)**: Correctly predicted negative (e.g., correctly identified unstressed plant)
+- **FP (False Positive)**: Wrongly predicted positive (false alarm - predicted stress when plant was fine)
+- **FN (False Negative)**: Wrongly predicted negative (missed detection - failed to detect actual stress)
+
+#### Metric Selection Guidelines
+
+For this plant stress classification project:
+
+1. **Class imbalance present** → Use Balanced Accuracy + F1-Score
+2. **Both FN and FP matter** → Monitor Precision, Recall, and F1-Score
+3. **Different costs for errors** → Check confusion matrices for error patterns
+4. **Overall performance** → Regular Accuracy still useful when classes are balanced
+
+The confusion matrix visualizations in the figures show the actual error patterns, helping identify whether the model tends to miss stressed plants (FN) or raise false alarms (FP).
+
+---
+
 ## Experimental Tasks
 
 ### Task 1: Plant Classification Tasks (4 Binary Classification Problems)
@@ -211,37 +335,13 @@ data/raw/PlantSounds/
 
 #### Task 1 Results Visualization
 
-**Figure 1a: Task 1 Mean Balanced Accuracy Comparison**
+**Figure 1a: Task 1 Confusion Matrices**
+![Task 1 Confusion Matrices](experiments/figures/task1_confusion_matrices.png)
+*Pooled confusion matrices across all LOPO folds for each Task 1 subtask. Shows classification errors for both Baseline CNN and MyModel. All tasks including tomato/tobacco dry vs cut are successfully visualized.*
+
+**Figure 1b: Task 1 Mean Balanced Accuracy Comparison**
 ![Task 1 Bar Chart](experiments/figures/task1_balanced_accuracy_bar.png)
 *Comparison of mean balanced accuracy across all 4 Task 1 subtasks. Shows Baseline CNN, MyModel (100% labels), and MyModel (50% labels) performance.*
-
-**Figure 1b: Task 1 Fold-wise Accuracy Distribution**
-![Task 1 Boxplot](experiments/figures/task1_balanced_accuracy_boxplot.png)
-*Distribution of fold-wise balanced accuracy for each Task 1 subtask. Compares Baseline CNN vs MyModel performance variability.*
-
-**Figure 1c: Task 1 Baseline vs MyModel Comparison**
-![Task 1 Paired Scatter](experiments/figures/task1_paired_scatter.png)
-*Fold-by-fold comparison between Baseline and MyModel. Each point represents one LOPO fold. Points above y=x line indicate MyModel outperforms Baseline.*
-
-**Figure 1d: Task 1 Confusion Matrices**
-![Task 1 Confusion Matrices](experiments/figures/task1_confusion_matrices.png)
-*Pooled confusion matrices across all LOPO folds for each Task 1 subtask. Shows classification errors for both Baseline and MyModel.*
-
-**Figure 1e: Fold-wise Accuracy for Dry Samples**
-![Task 1 Fold Accuracy Dry](experiments/figures/task1_fold_accuracy_dry.png)
-*Per-fold accuracy comparison for dry-stressed samples in tomato and tobacco. Each point represents one LOPO fold where the test plant was under drought stress.*
-
-**Figure 1f: Fold-wise Accuracy for Cut Samples**
-![Task 1 Fold Accuracy Cut](experiments/figures/task1_fold_accuracy_cut.png)
-*Per-fold accuracy comparison for cut-stressed samples in tomato and tobacco. Each point represents one LOPO fold where the test plant had mechanical stem damage.*
-
-**Figure 1g: Class-wise Accuracy Comparison**
-![Task 1 Classwise Accuracy](experiments/figures/task1_classwise_accuracy_bar.png)
-*Mean accuracy breakdown by stress condition (dry vs cut) for tomato and tobacco classification tasks. Shows how well models perform on each specific stress type.*
-
-**Figure 1h: Sequential Performance by Condition**
-![Task 1 Sequential Performance](experiments/figures/task1_sequential_performance.png)
-*Sequential fold-wise performance colored by stress condition. Visualizes performance patterns across all LOPO folds with color-coding for dry (blue/gold) vs cut (pink/orange) samples.*
 
 ---
 
@@ -302,17 +402,13 @@ data/raw/PlantSounds/
 
 ### Task 2 & 3 Results Visualization
 
-**Figure 2a: Task 2/3 Mean Balanced Accuracy Comparison**
+**Figure 2a: Task 2/3 Confusion Matrices**
+![Task 2/3 Confusion Matrices](experiments/figures/task2_task3_confusion_matrices.png)
+*Pooled confusion matrices for Task 2 and Task 3. Demonstrates strong class separation in plant vs noise classification. Text overlap issues have been fixed with improved layout.*
+
+**Figure 2b: Task 2/3 Mean Balanced Accuracy Comparison**
 ![Task 2/3 Bar Chart](experiments/figures/task2_task3_balanced_accuracy_bar.png)
 *Mean balanced accuracy comparison for Task 2 (plant vs empty pot) and Task 3 (tomato vs greenhouse noise). Both tasks show >95% accuracy.*
-
-**Figure 2b: Task 2/3 Baseline vs MyModel Comparison**
-![Task 2/3 Paired Scatter](experiments/figures/task2_task3_paired_scatter.png)
-*Fold-wise performance comparison between Baseline and MyModel for Task 2 and Task 3. Shows consistent high performance across folds.*
-
-**Figure 2c: Task 2/3 Confusion Matrices**
-![Task 2/3 Confusion Matrices](experiments/figures/task2_task3_confusion_matrices.png)
-*Pooled confusion matrices for Task 2 and Task 3. Demonstrates strong class separation in plant vs noise classification.*
 
 ---
 
@@ -359,63 +455,22 @@ data/raw/PlantSounds/
 
 **Figure 3: Task 4 Semi-Supervised Learning Effect**
 ![Task 4 Label Fraction Effect](experiments/figures/task4_label_fraction_effect.png)
-*Semi-supervised learning effect across all 4 Task 1 subtasks. Shows MyModel performance with 50% vs 100% labels compared to Baseline. Demonstrates label efficiency with minimal performance drop.*
+*Grouped bar chart comparing Baseline CNN, MyModel (50% labels), and MyModel (100% labels) across all 4 Task 1 subtasks. Each task shows three bars for easy comparison. Arrows and percentages indicate improvement from semi-supervised to fully-supervised learning. This clear visualization demonstrates label efficiency with minimal performance drop when using only 50% labeled data.*
 
 ---
 
-## Model Architecture
+### Metrics Summary Table
 
-### Baseline CNN (Khait et al., 2023)
+**Figure 4: Comprehensive Metrics Summary**
+![Metrics Summary Table](experiments/figures/metrics_summary_table.svg)
+*Academic-style metrics summary table showing all key classification metrics for all 6 tasks (Task 1: 4 subtasks, Task 2, Task 3). Includes Accuracy, Balanced Accuracy, Macro F1-Score, Precision, Recall, and Specificity for both Baseline CNN and MyModel. This provides a complete quantitative comparison at a glance.*
 
-![Baseline](experiments/figures/baseline_architecture.svg)
+**Key Insights from Metrics**:
 
-### MyModel (Baseline CNN + VAE + SSL + DG)
-
-![MyModel](experiments/figures/mymodel_architecture.svg)
-
-**Architecture Details**:
-
-- **Backbone**: Identical CNN structure to Baseline (Khait et al., 2023)
-- **Embedding h**: 128-dimensional feature representation from CNN backbone
-- **Main Classifier**: h → binary logit (BCEWithLogitsLoss)
-- **VAE Module**:
-  - Encoder: h → (μ, log σ²) in 32-dim latent space
-  - Reparameterization: z = μ + σ ⊙ ε
-  - Decoder: z → h_reconstructed
-  - Loss: MSE(h, h_rec) + β·KL(q(z|h) || N(0, I))
-- **SSL (Semi-Supervised Learning)**:
-  - Consistency regularization between z(x) and z(x_augmented)
-  - Enables learning from unlabeled data (50% label experiments)
-- **DG (Domain Generalization)**:
-  - Domain classifier head: h → domain logits
-  - Improves robustness across recording conditions
-
----
-
-## Training Protocol
-
-### Data Preprocessing
-
-1. **Resampling**: All audio to 500 kHz
-2. **Segmentation**: 2ms windows (1000 samples)
-3. **High-pass Filter**: Remove low-frequency noise
-4. **Normalization**: Zero mean, unit variance
-
-### Cross-Validation
-
-**LOPO (Leave-One-Plant-Out)**:
-- Each fold holds out all recordings from one plant
-- Tests generalization to new individuals
-- More realistic evaluation than random splits
-
-### Training Configuration
-
-```python
-Optimizer: Adam (lr=5e-4)
-Loss: BCEWithLogitsLoss (with class balancing)
-Batch size: 64
-Epochs: 10 (with early stopping)
-```
+- **Balanced Performance**: Both models achieve strong precision, recall, and specificity across all tasks
+- **Macro F1-Score**: Validates overall classification quality by averaging per-class F1 scores
+- **Task-specific Patterns**: Task 1.2 (Tobacco dry vs cut) shows perfect metrics (1.000) for MyModel, while noise separation tasks (Task 2/3) show consistently high performance (>0.95) for both models
+- **Consistent Improvement**: MyModel generally outperforms Baseline across most metrics and tasks
 
 ---
 
@@ -804,37 +859,13 @@ data/raw/PlantSounds/
 
 #### Task 1 결과 시각화
 
-**그림 1a: Task 1 평균 균형 정확도 비교**
+**그림 1a: Task 1 혼동 행렬**
+![Task 1 혼동 행렬](experiments/figures/task1_confusion_matrices.png)
+*각 Task 1 하위 과제의 모든 LOPO fold에 대한 통합 혼동 행렬. Baseline CNN과 MyModel 모두의 분류 오류를 보여줌. 토마토/담배 dry vs cut을 포함한 모든 과제가 성공적으로 시각화됨.*
+
+**그림 1b: Task 1 평균 균형 정확도 비교**
 ![Task 1 막대 그래프](experiments/figures/task1_balanced_accuracy_bar.png)
 *4개 Task 1 하위 과제 전체의 평균 균형 정확도 비교. Baseline CNN, MyModel (100% 라벨), MyModel (50% 라벨) 성능을 보여줌.*
-
-**그림 1b: Task 1 Fold별 정확도 분포**
-![Task 1 박스플롯](experiments/figures/task1_balanced_accuracy_boxplot.png)
-*각 Task 1 하위 과제의 fold별 균형 정확도 분포. Baseline CNN vs MyModel 성능 변동성 비교.*
-
-**그림 1c: Task 1 Baseline vs MyModel 비교**
-![Task 1 쌍별 산점도](experiments/figures/task1_paired_scatter.png)
-*Baseline과 MyModel의 fold별 비교. 각 점은 하나의 LOPO fold를 나타냄. y=x 선 위의 점은 MyModel이 Baseline을 능가함을 나타냄.*
-
-**그림 1d: Task 1 혼동 행렬**
-![Task 1 혼동 행렬](experiments/figures/task1_confusion_matrices.png)
-*각 Task 1 하위 과제의 모든 LOPO fold에 대한 통합 혼동 행렬. Baseline과 MyModel 모두의 분류 오류를 보여줌.*
-
-**그림 1e: Dry 샘플 Fold별 정확도**
-![Task 1 Fold 정확도 Dry](experiments/figures/task1_fold_accuracy_dry.png)
-*토마토와 담배의 dry 스트레스 샘플에 대한 fold별 정확도 비교. 각 점은 테스트 식물이 가뭄 스트레스를 받은 하나의 LOPO fold를 나타냄.*
-
-**그림 1f: Cut 샘플 Fold별 정확도**
-![Task 1 Fold 정확도 Cut](experiments/figures/task1_fold_accuracy_cut.png)
-*토마토와 담배의 cut 스트레스 샘플에 대한 fold별 정확도 비교. 각 점은 테스트 식물이 줄기 기계적 손상을 받은 하나의 LOPO fold를 나타냄.*
-
-**그림 1g: 클래스별 정확도 비교**
-![Task 1 클래스별 정확도](experiments/figures/task1_classwise_accuracy_bar.png)
-*토마토와 담배 분류 작업에 대한 스트레스 조건(dry vs cut)별 평균 정확도 분석. 각 특정 스트레스 유형에 대한 모델 성능을 보여줌.*
-
-**그림 1h: 조건별 순차 성능**
-![Task 1 순차 성능](experiments/figures/task1_sequential_performance.png)
-*스트레스 조건별로 색상 코딩된 순차 fold별 성능. 모든 LOPO fold에 걸친 성능 패턴을 dry(파랑/금색) vs cut(분홍/주황) 샘플에 대한 색상 코딩으로 시각화.*
 
 ---
 
@@ -895,17 +926,13 @@ data/raw/PlantSounds/
 
 ### Task 2 & 3 결과 시각화
 
-**그림 2a: Task 2/3 평균 균형 정확도 비교**
+**그림 2a: Task 2/3 혼동 행렬**
+![Task 2/3 혼동 행렬](experiments/figures/task2_task3_confusion_matrices.png)
+*Task 2와 Task 3의 통합 혼동 행렬. 식물 vs 소음 분류에서 강력한 클래스 분리를 보여줌. 텍스트 겹침 문제가 개선된 레이아웃으로 수정됨.*
+
+**그림 2b: Task 2/3 평균 균형 정확도 비교**
 ![Task 2/3 막대 그래프](experiments/figures/task2_task3_balanced_accuracy_bar.png)
 *Task 2 (식물 vs 빈 화분)와 Task 3 (토마토 vs 온실 소음)의 평균 균형 정확도 비교. 두 작업 모두 >95% 정확도를 보여줌.*
-
-**그림 2b: Task 2/3 Baseline vs MyModel 비교**
-![Task 2/3 쌍별 산점도](experiments/figures/task2_task3_paired_scatter.png)
-*Task 2와 Task 3에 대한 Baseline과 MyModel의 fold별 성능 비교. 모든 fold에서 일관된 높은 성능을 보여줌.*
-
-**그림 2c: Task 2/3 혼동 행렬**
-![Task 2/3 혼동 행렬](experiments/figures/task2_task3_confusion_matrices.png)
-*Task 2와 Task 3의 통합 혼동 행렬. 식물 vs 소음 분류에서 강력한 클래스 분리를 보여줌.*
 
 ---
 
@@ -952,7 +979,22 @@ data/raw/PlantSounds/
 
 **그림 3: Task 4 반지도 학습 효과**
 ![Task 4 라벨 비율 효과](experiments/figures/task4_label_fraction_effect.png)
-*4개 Task 1 하위 과제 전체의 반지도 학습 효과. Baseline과 비교하여 50% vs 100% 라벨 사용 시 MyModel 성능을 보여줌. 최소한의 성능 저하로 라벨 효율성을 입증.*
+*4개 Task 1 하위 과제에 대한 Baseline CNN, MyModel (50% 라벨), MyModel (100% 라벨)을 비교하는 그룹화된 막대 그래프. 각 과제는 쉬운 비교를 위해 세 개의 막대를 보여줌. 화살표와 백분율은 반지도에서 완전 지도 학습으로의 개선을 나타냄. 이 명확한 시각화는 50% 라벨 데이터만 사용했을 때의 최소한의 성능 저하로 라벨 효율성을 입증.*
+
+---
+
+### 지표 요약 테이블
+
+**그림 4: 포괄적 지표 요약**
+![지표 요약 테이블](experiments/figures/metrics_summary_table.svg)
+*모든 6개 과제(Task 1: 4개 하위과제, Task 2, Task 3)에 대한 모든 주요 분류 지표를 보여주는 학술 논문 스타일 지표 요약 테이블. Baseline CNN과 MyModel 모두에 대한 Accuracy, Balanced Accuracy, Macro F1-Score, Precision, Recall, Specificity를 포함. 한눈에 완전한 정량적 비교 제공.*
+
+**지표에서의 주요 인사이트**:
+
+- **균형 잡힌 성능**: 두 모델 모두 모든 과제에서 강력한 precision, recall, specificity 달성
+- **Macro F1-Score**: 클래스별 F1 점수를 평균하여 전반적인 분류 품질 검증
+- **과제별 패턴**: Task 1.2 (담배 dry vs cut)는 MyModel에서 완벽한 지표(1.000)를 보이는 반면, 소음 분리 과제(Task 2/3)는 두 모델 모두 일관되게 높은 성능(>0.95) 보임
+- **일관된 개선**: MyModel은 대부분의 지표와 과제에서 일반적으로 Baseline을 능가함
 
 ---
 
@@ -1010,6 +1052,80 @@ Loss: BCEWithLogitsLoss (클래스 균형 포함)
 Batch size: 64
 Epochs: 10 (조기 종료 포함)
 ```
+
+### 평가 지표 (Evaluation Metrics)
+
+이 프로젝트는 포괄적인 성능 평가를 위해 여러 분류 지표를 사용합니다:
+
+#### 주요 지표
+
+##### 1. Balanced Accuracy (균형 정확도) - 본 프로젝트의 주 지표
+
+- 공식: `(Recall + Specificity) / 2 = (TPR + TNR) / 2`
+- **사용 이유**: 식물 스트레스 데이터셋은 클래스 불균형이 있습니다 (특히 LOPO에서 각 fold는 하나의 스트레스 조건을 가진 한 식물만 테스트할 수 있음). Balanced accuracy는 클래스별 recall을 평균하여 두 클래스를 동등하게 취급하므로, 불균형 데이터에서 일반 accuracy보다 신뢰할 수 있습니다.
+- **해석**: 완벽한 점수 = 1.0, 무작위 추측 = 0.5
+
+##### 2. Accuracy (정확도)
+
+- 공식: `(TP + TN) / (TP + TN + FP + FN)`
+- 전체 샘플 중 올바른 예측의 비율
+- **한계**: 클래스 불균형 시 오해의 소지가 있음 (예: 모든 샘플을 한 클래스로 예측해도 높은 accuracy 가능)
+
+#### 추가 중요 지표
+
+##### 3. Precision (정밀도, 양성 예측도)
+
+- 공식: `TP / (TP + FP)`
+- "양성으로 예측한 것 중 실제로 양성인 비율은?"
+- **사용 사례**: 거짓 경보(FP)의 비용이 클 때 중요
+- 높은 precision = 신뢰할 수 있는 양성 예측
+
+##### 4. Recall (재현율, 민감도, True Positive Rate)
+
+- 공식: `TP / (TP + FN)`
+- "실제 양성 샘플 중 얼마나 많이 올바르게 식별했는가?"
+- **사용 사례**: 양성을 놓치는 것(FN)의 비용이 클 때 중요
+- 높은 recall = 실제 양성 케이스 대부분/전부 찾아냄
+
+##### 5. Specificity (특이도, True Negative Rate)
+
+- 공식: `TN / (TN + FP)`
+- "실제 음성 샘플 중 얼마나 많이 올바르게 식별했는가?"
+- 모델이 음성 클래스를 얼마나 잘 식별하는지 측정
+
+##### 6. F1-Score (F1 점수)
+
+- 공식: `2 × (Precision × Recall) / (Precision + Recall)`
+- Precision과 Recall의 조화 평균
+- **사용 사례**: 균형 잡힌 precision과 recall이 필요할 때
+- Precision이나 Recall 중 하나가 낮으면 F1-score도 낮아짐
+
+#### 혼동 행렬(Confusion Matrix) 이해하기
+
+```
+                  예측
+              음성      양성
+실제  음성      TN        FP      ← False Positive: 거짓 경보
+      양성      FN        TP      ← False Negative: 놓친 검출
+                 ↑
+            놓친 케이스
+```
+
+- **TP (True Positive)**: 양성을 올바르게 예측 (예: 스트레스 받은 식물을 정확히 식별)
+- **TN (True Negative)**: 음성을 올바르게 예측 (예: 스트레스 없는 식물을 정확히 식별)
+- **FP (False Positive)**: 양성으로 잘못 예측 (거짓 경보 - 괜찮은 식물을 스트레스 받았다고 예측)
+- **FN (False Negative)**: 음성으로 잘못 예측 (놓친 검출 - 실제 스트레스를 감지하지 못함)
+
+#### 지표 선택 가이드라인
+
+이 식물 스트레스 분류 프로젝트의 경우:
+
+1. **클래스 불균형 존재** → Balanced Accuracy + F1-Score 사용
+2. **FN과 FP 모두 중요** → Precision, Recall, F1-Score 모니터링
+3. **오류 유형별 비용 차이** → 혼동 행렬에서 오류 패턴 확인
+4. **전반적 성능** → 클래스가 균형잡혔을 때 일반 Accuracy도 유용
+
+그림의 혼동 행렬 시각화는 실제 오류 패턴을 보여주며, 모델이 스트레스 받은 식물을 놓치는 경향(FN)이 있는지 거짓 경보를 내는 경향(FP)이 있는지 식별하는 데 도움을 줍니다.
 
 ---
 
