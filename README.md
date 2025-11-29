@@ -526,24 +526,16 @@ After completing all experimental tasks (Task 1-4), here is a comprehensive summ
 
 **Figure 4: Comprehensive Metrics Summary Table**
 
-<details>
-<summary><b>View Metrics Table (Click to expand)</b></summary>
-
 ![Metrics Summary Table](experiments/figures/metrics_summary_table.svg)
-
-</details>
 
 **Table Description**: Academic-style metrics summary showing all key classification metrics for all 6 tasks (Task 1: 4 subtasks, Task 2, Task 3). Includes Accuracy, Balanced Accuracy, Macro F1-Score, Precision, Recall, and Specificity for both Baseline CNN and MyModel.
 
-<details>
-<summary><b>Key Insights from Metrics (Click to expand)</b></summary>
+**Key Insights from Metrics**:
 
 - **Balanced Performance**: Both models achieve strong precision, recall, and specificity across all tasks
 - **Macro F1-Score**: Validates overall classification quality by averaging per-class F1 scores
 - **Task-specific Patterns**: Task 1.2 (Tobacco dry vs cut) shows perfect metrics (1.000) for MyModel, while noise separation tasks (Task 2/3) show consistently high performance (>0.95) for both models
 - **Consistent Improvement**: MyModel generally outperforms Baseline across most metrics and tasks
-
-</details>
 
 ---
 
@@ -1201,24 +1193,16 @@ figures의 혼동 행렬 시각화는 실제 오류 패턴을 보여주며, 모�
 
 **그림 4: 포괄적 지표 요약 테이블**
 
-<details>
-<summary><b>지표 테이블 보기 (클릭하여 펼치기)</b></summary>
-
 ![지표 요약 테이블](experiments/figures/metrics_summary_table.svg)
-
-</details>
 
 **테이블 설명**: 모든 6개 과제(Task 1: 4개 하위과제, Task 2, Task 3)에 대한 모든 주요 분류 지표를 보여주는 학술 논문 스타일 지표 요약 테이블. Baseline CNN과 MyModel 모두에 대한 Accuracy, Balanced Accuracy, Macro F1-Score, Precision, Recall, Specificity를 포함.
 
-<details>
-<summary><b>지표에서의 주요 인사이트 (클릭하여 펼치기)</b></summary>
+**지표에서의 주요 인사이트**:
 
 - **균형 잡힌 성능**: 두 모델 모두 모든 과제에서 강력한 precision, recall, specificity 달성
 - **Macro F1-Score**: 클래스별 F1 점수를 평균하여 전반적인 분류 품질 검증
 - **과제별 패턴**: Task 1.2 (담배 dry vs cut)는 MyModel에서 완벽한 지표(1.000)를 보이는 반면, 소음 분리 과제(Task 2/3)는 두 모델 모두 일관되게 높은 성능(>0.95) 보임
 - **일관된 개선**: MyModel은 대부분의 지표와 과제에서 일반적으로 Baseline을 능가함
-
-</details>
 
 
 ## 실험 실행
