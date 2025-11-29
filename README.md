@@ -1,3 +1,9 @@
+# Plant Sound Classification with Deep Learning
+
+**English** | [한국어](#한국어-버전)
+
+---
+
 ## Working Environment
 
 - **Python**: 3.8+
@@ -44,6 +50,61 @@ pip install -r requirements.txt
   - Make sure the folder is named `.venv` (with the dot prefix)
 - **Model Checkpoints**: All `.pth` and `.pt` checkpoint files have been removed to reduce repository size
 - **Reproducing Experiments**: Use the training scripts in `src/training/` to retrain models from scratch
+
+---
+
+## File Structure
+
+```
+plant_model/
+├── data/
+│   ├── raw/
+│   │   └── PlantSounds/          # Original dataset (.wav files)
+│   └── processed/                 # Preprocessed data (excluded from git)
+├── experiments/
+│   ├── task1_baseline/            # Baseline results (CSV files only)
+│   ├── task1_my_model/            # Enhanced model results (CSV files only)
+│   ├── task2_baseline/            # Task 2 baseline results
+│   ├── task2_my_model/            # Task 2 enhanced results
+│   ├── task3_baseline/            # Task 3 baseline results
+│   ├── task3_my_model/            # Task 3 enhanced results
+│   ├── task4_my_model/            # Task 4 semi-supervised results
+│   └── figures/                   # Generated visualization plots
+├── src/
+│   ├── datasets/
+│   │   └── plantsounds.py         # Data loading & LOPO splits
+│   ├── models/
+│   │   ├── baseline_cnn.py        # Baseline CNN (Khait et al. 2023)
+│   │   └── my_model.py            # Enhanced model (VAE + SSL + DG)
+│   ├── training/
+│   │   ├── common.py              # Shared training utilities
+│   │   ├── train_task1.py         # Task 1 baseline training
+│   │   ├── train_my_model_task1.py # Task 1 enhanced training
+│   │   ├── train_task2.py         # Task 2 baseline training
+│   │   ├── train_my_model_task2.py # Task 2 enhanced training
+│   │   ├── train_task3.py         # Task 3 baseline training
+│   │   ├── train_my_model_task3.py # Task 3 enhanced training
+│   │   └── train_my_model_task4.py # Task 4 semi-supervised training
+│   ├── utils/
+│   │   ├── audio.py               # Audio processing utilities
+│   │   └── split.py               # Data splitting utilities
+│   └── analysis/
+│       └── plot_results.py        # Visualization and analysis scripts
+├── .venv.zip                      # Compressed virtual environment
+├── .gitignore                     # Git ignore rules (excludes checkpoints)
+├── requirements.txt
+├── verify_plots.py                # Plot data verification script
+├── validate_plot_consistency.py  # Data consistency validation
+└── README.md
+```
+
+**Important Notes**:
+
+- **Model checkpoints removed**: All `.pth` and `.pt` files are excluded via `.gitignore` to reduce repository size (~6GB → manageable size)
+- **Results preserved**: CSV files containing accuracy metrics and fold-wise results are retained in `experiments/`
+- **Virtual environment compressed**: `.venv` is provided as `.venv.zip` - extract before use
+- **Raw data included**: Original `.wav` audio files are preserved in `data/raw/PlantSounds/`
+- **To reproduce experiments**: Retrain models using the training scripts in `src/training/`
 
 ---
 
@@ -574,60 +635,6 @@ python -m src.analysis.plot_results
 
 ---
 
-## File Structure
-
-```
-plant_model/
-├── data/
-│   ├── raw/
-│   │   └── PlantSounds/          # Original dataset (.wav files)
-│   └── processed/                 # Preprocessed data (excluded from git)
-├── experiments/
-│   ├── task1_baseline/            # Baseline results (CSV files only)
-│   ├── task1_my_model/            # Enhanced model results (CSV files only)
-│   ├── task2_baseline/            # Task 2 baseline results
-│   ├── task2_my_model/            # Task 2 enhanced results
-│   ├── task3_baseline/            # Task 3 baseline results
-│   ├── task3_my_model/            # Task 3 enhanced results
-│   ├── task4_my_model/            # Task 4 semi-supervised results
-│   └── figures/                   # Generated visualization plots
-├── src/
-│   ├── datasets/
-│   │   └── plantsounds.py         # Data loading & LOPO splits
-│   ├── models/
-│   │   ├── baseline_cnn.py        # Baseline CNN (Khait et al. 2023)
-│   │   └── my_model.py            # Enhanced model (VAE + SSL + DG)
-│   ├── training/
-│   │   ├── common.py              # Shared training utilities
-│   │   ├── train_task1.py         # Task 1 baseline training
-│   │   ├── train_my_model_task1.py # Task 1 enhanced training
-│   │   ├── train_task2.py         # Task 2 baseline training
-│   │   ├── train_my_model_task2.py # Task 2 enhanced training
-│   │   ├── train_task3.py         # Task 3 baseline training
-│   │   ├── train_my_model_task3.py # Task 3 enhanced training
-│   │   └── train_my_model_task4.py # Task 4 semi-supervised training
-│   ├── utils/
-│   │   ├── audio.py               # Audio processing utilities
-│   │   └── split.py               # Data splitting utilities
-│   └── analysis/
-│       └── plot_results.py        # Visualization and analysis scripts
-├── .venv.zip                      # Compressed virtual environment
-├── .gitignore                     # Git ignore rules (excludes checkpoints)
-├── requirements.txt
-├── verify_plots.py                # Plot data verification script
-├── validate_plot_consistency.py  # Data consistency validation
-└── README.md
-```
-
-**Important Notes**:
-- **Model checkpoints removed**: All `.pth` and `.pt` files are excluded via `.gitignore` to reduce repository size (~6GB → manageable size)
-- **Results preserved**: CSV files containing accuracy metrics and fold-wise results are retained in `experiments/`
-- **Virtual environment compressed**: `.venv` is provided as `.venv.zip` - extract before use
-- **Raw data included**: Original `.wav` audio files are preserved in `data/raw/PlantSounds/`
-- **To reproduce experiments**: Retrain models using the training scripts in `src/training/`
-
----
-
 ## Citation
 
 If you use this code or findings in your research, please cite:
@@ -661,7 +668,9 @@ For questions or collaborations, please open an issue in the repository.
 ---
 ---
 
-# 한국어 버전
+<a id="한국어-버전"></a>
+
+## 한국어 버전
 
 **[English](#plant-sound-classification-with-deep-learning)** | 한국어
 
@@ -707,9 +716,67 @@ pip install -r requirements.txt
 ```
 
 **주의사항**:
-- 모델 체크포인트 파일(`.pth`, `.pt`)은 저장소 크기를 줄이기 위해 제거되었습니다
-- `.venv` 폴더는 압축 아카이브로 제공됩니다
-- 실험을 재현하려면 training 스크립트를 사용하여 모델을 재학습해야 합니다
+
+- **가상환경**: 미리 구성된 `.venv.zip`을 [Google Drive](https://drive.google.com/file/d/1QZ1UrsQn2bE4EyJ01lqXQLlegxCJn-Zs/view?usp=drive_link)에서 다운로드하세요
+  - zip 파일을 `plant_model/.venv/`로 압축 해제하세요 (.venv 폴더는 src/ 및 data/와 같은 수준에 위치해야 함)
+  - 폴더 이름이 `.venv`인지 확인하세요 (점 접두사 포함)
+- **모델 체크포인트**: 모든 `.pth` 및 `.pt` 체크포인트 파일은 저장소 크기를 줄이기 위해 제거되었습니다
+- **실험 재현**: `src/training/`의 학습 스크립트를 사용하여 모델을 처음부터 재학습하세요
+
+---
+
+## 파일 구조
+
+```
+plant_model/
+├── data/
+│   ├── raw/
+│   │   └── PlantSounds/          # 원본 데이터셋 (.wav 파일)
+│   └── processed/                 # 전처리된 데이터 (git에서 제외)
+├── experiments/
+│   ├── task1_baseline/            # Baseline 결과 (CSV 파일만)
+│   ├── task1_my_model/            # 개선 모델 결과 (CSV 파일만)
+│   ├── task2_baseline/            # Task 2 baseline 결과
+│   ├── task2_my_model/            # Task 2 개선 결과
+│   ├── task3_baseline/            # Task 3 baseline 결과
+│   ├── task3_my_model/            # Task 3 개선 결과
+│   ├── task4_my_model/            # Task 4 반지도 학습 결과
+│   └── figures/                   # 생성된 시각화 그래프
+├── src/
+│   ├── datasets/
+│   │   └── plantsounds.py         # 데이터 로딩 & LOPO 분할
+│   ├── models/
+│   │   ├── baseline_cnn.py        # Baseline CNN (Khait et al. 2023)
+│   │   └── my_model.py            # 개선 모델 (VAE + SSL + DG)
+│   ├── training/
+│   │   ├── common.py              # 공유 학습 유틸리티
+│   │   ├── train_task1.py         # Task 1 baseline 학습
+│   │   ├── train_my_model_task1.py # Task 1 개선 학습
+│   │   ├── train_task2.py         # Task 2 baseline 학습
+│   │   ├── train_my_model_task2.py # Task 2 개선 학습
+│   │   ├── train_task3.py         # Task 3 baseline 학습
+│   │   ├── train_my_model_task3.py # Task 3 개선 학습
+│   │   └── train_my_model_task4.py # Task 4 반지도 학습
+│   ├── utils/
+│   │   ├── audio.py               # 오디오 처리 유틸리티
+│   │   └── split.py               # 데이터 분할 유틸리티
+│   └── analysis/
+│       └── plot_results.py        # 시각화 및 분석 스크립트
+├── .venv.zip                      # 압축된 가상환경
+├── .gitignore                     # Git 무시 규칙 (체크포인트 제외)
+├── requirements.txt
+├── verify_plots.py                # 플롯 데이터 검증 스크립트
+├── validate_plot_consistency.py  # 데이터 일관성 검증
+└── README.md
+```
+
+**중요 사항**:
+
+- **모델 체크포인트 제거**: 모든 `.pth` 및 `.pt` 파일은 저장소 크기 축소를 위해 `.gitignore`를 통해 제외됨 (~6GB → 관리 가능한 크기)
+- **결과 보존**: 정확도 지표 및 fold별 결과를 포함하는 CSV 파일은 `experiments/`에 유지됨
+- **가상환경 압축**: `.venv`는 `.venv.zip`으로 제공됨 - 사용 전 압축 해제 필요
+- **원시 데이터 포함**: 원본 `.wav` 오디오 파일은 `data/raw/PlantSounds/`에 보존됨
+- **실험 재현**: `src/training/`의 학습 스크립트를 사용하여 모델 재학습 필요
 
 ---
 
@@ -739,6 +806,32 @@ pip install -r requirements.txt
 
 ---
 
+## 데이터셋
+
+본 프로젝트는 **Khait et al. (2023)**의 PlantSounds 데이터셋을 사용합니다:
+
+- **종**: 토마토 (*Solanum lycopersicum*), 담배 (*Nicotiana tabacum*)
+- **스트레스 조건**:
+  - **Dry**: 물 부족으로 인한 스트레스
+  - **Cut**: 줄기 절단으로 인한 기계적 손상
+- **대조군**: 빈 화분 녹음, 온실 배경 소음
+- **샘플링 레이트**: 500 kHz (초음파 범위)
+- **세그먼트 길이**: 2ms 윈도우 (1000 샘플)
+
+**파일 명명 규칙**:
+
+```
+data/raw/PlantSounds/
+├── tomato_dry_*.wav
+├── tomato_cut_*.wav
+├── tobacco_dry_*.wav
+├── tobacco_cut_*.wav
+├── tomato_*_empty_*.wav
+└── greenhouse_*.wav
+```
+
+---
+
 ## 연구 목적
 
 본 프로젝트는 다음을 목표로 합니다:
@@ -757,27 +850,134 @@ pip install -r requirements.txt
 
 ---
 
-## 데이터셋
+## 모델 아키텍처
 
-**PlantSounds** 데이터셋은 다음을 포함한 초음파 녹음(500 kHz 샘플링)으로 구성됩니다:
+### Baseline CNN (Khait et al., 2023)
 
-- **식물 종**: 토마토 (*Solanum lycopersicum*), 담배 (*Nicotiana tabacum*)
-- **스트레스 조건**:
-  - Dry (가뭄 스트레스)
-  - Cut (기계적 손상)
-- **대조군**: 빈 화분, 온실 배경 소음
+![Baseline](experiments/figures/baseline_architecture.svg)
 
-### 데이터 구조
+### MyModel (Baseline CNN + VAE + SSL + DG)
+
+![MyModel](experiments/figures/mymodel_architecture.svg)
+
+**아키텍처 세부사항**:
+
+- **백본**: Baseline과 동일한 CNN 구조 (Khait et al., 2023)
+- **임베딩 h**: CNN 백본으로부터의 128차원 특징 표현
+- **주 분류기**: h → 이진 로짓 (BCEWithLogitsLoss)
+- **VAE 모듈**:
+  - 인코더: h → (μ, log σ²) 32차원 잠재 공간
+  - 재매개변수화: z = μ + σ ⊙ ε
+  - 디코더: z → h_reconstructed
+  - 손실: MSE(h, h_rec) + β·KL(q(z|h) || N(0, I))
+- **SSL (반지도 학습)**:
+  - z(x)와 z(x_증강) 간 일관성 정규화
+  - 라벨 없는 데이터 학습 가능 (50% 라벨 실험)
+- **DG (도메인 일반화)**:
+  - 도메인 분류기 헤드: h → 도메인 로짓
+  - 녹음 조건 간 강건성 향상
+
+---
+
+## 학습 프로토콜
+
+### 데이터 전처리
+
+1. **리샘플링**: 모든 오디오를 500 kHz로
+2. **세그먼테이션**: 2ms 윈도우 (1000 샘플)
+3. **고역 통과 필터**: 저주파 노이즈 제거
+4. **정규화**: 평균 0, 분산 1
+
+### 교차 검증
+
+**LOPO (Leave-One-Plant-Out)**:
+
+- 각 fold는 한 식물의 모든 녹음을 홀드아웃
+- 새로운 개체에 대한 일반화 테스트
+- 무작위 분할보다 현실적인 평가
+
+### 학습 설정
+
+```python
+Optimizer: Adam (lr=5e-4)
+Loss: BCEWithLogitsLoss (클래스 균형 포함)
+Batch size: 64
+Epochs: 10 (조기 종료 포함)
+```
+
+### 평가 지표 (Evaluation Metrics)
+
+이 프로젝트는 포괄적인 성능 평가를 위해 여러 분류 지표를 사용합니다:
+
+#### 주요 지표
+
+##### 1. Balanced Accuracy (균형 정확도) - 본 프로젝트의 주 지표
+
+- 공식: `(Recall + Specificity) / 2 = (TPR + TNR) / 2`
+- **사용 이유**: 식물 스트레스 데이터셋은 클래스 불균형이 있습니다 (특히 LOPO에서 각 fold는 하나의 스트레스 조건을 가진 한 식물만 테스트할 수 있음). Balanced accuracy는 클래스별 recall을 평균하여 두 클래스를 동등하게 취급하므로, 불균형 데이터에서 일반 accuracy보다 신뢰할 수 있습니다.
+- **해석**: 완벽한 점수 = 1.0, 무작위 추측 = 0.5
+
+##### 2. Accuracy (정확도)
+
+- 공식: `(TP + TN) / (TP + TN + FP + FN)`
+- 전체 샘플 중 올바른 예측의 비율
+- **한계**: 클래스 불균형 시 오해의 소지가 있음 (예: 모든 샘플을 한 클래스로 예측해도 높은 accuracy 가능)
+
+#### 추가 중요 지표
+
+##### 3. Precision (정밀도, 양성 예측도)
+
+- 공식: `TP / (TP + FP)`
+- "양성으로 예측한 것 중 실제로 양성인 비율은?"
+- **사용 사례**: 거짓 경보(FP)의 비용이 클 때 중요
+- 높은 precision = 신뢰할 수 있는 양성 예측
+
+##### 4. Recall (재현율, 민감도, True Positive Rate)
+
+- 공식: `TP / (TP + FN)`
+- "실제 양성 샘플 중 얼마나 많이 올바르게 식별했는가?"
+- **사용 사례**: 양성을 놓치는 것(FN)의 비용이 클 때 중요
+- 높은 recall = 실제 양성 케이스 대부분/전부 찾아냄
+
+##### 5. Specificity (특이도, True Negative Rate)
+
+- 공식: `TN / (TN + FP)`
+- "실제 음성 샘플 중 얼마나 많이 올바르게 식별했는가?"
+- 모델이 음성 클래스를 얼마나 잘 식별하는지 측정
+
+##### 6. F1-Score (F1 점수)
+
+- 공식: `2 × (Precision × Recall) / (Precision + Recall)`
+- Precision과 Recall의 조화 평균
+- **사용 사례**: 균형 잡힌 precision과 recall이 필요할 때
+- Precision이나 Recall 중 하나라도 낮으면 F1-score도 낮아짐
+
+#### 혼동 행렬 이해하기
 
 ```
-data/raw/PlantSounds/
-├── tomato_dry_*.wav
-├── tomato_cut_*.wav
-├── tobacco_dry_*.wav
-├── tobacco_cut_*.wav
-├── tomato_*_empty_*.wav
-└── greenhouse_*.wav
+                  예측
+              음성      양성
+실제   음성   TN        FP      ← 거짓 양성: 잘못된 경보
+       양성   FN        TP      ← 거짓 음성: 놓친 감지
+                ↑
+           놓친 케이스
 ```
+
+- **TP (True Positive)**: 올바르게 양성 예측 (예: 스트레스 받은 식물을 올바르게 식별)
+- **TN (True Negative)**: 올바르게 음성 예측 (예: 스트레스 없는 식물을 올바르게 식별)
+- **FP (False Positive)**: 잘못 양성 예측 (거짓 경보 - 식물이 괜찮은데 스트레스로 예측)
+- **FN (False Negative)**: 잘못 음성 예측 (놓친 감지 - 실제 스트레스 감지 실패)
+
+#### 지표 선택 가이드라인
+
+본 식물 스트레스 분류 프로젝트의 경우:
+
+1. **클래스 불균형 존재** → Balanced Accuracy + F1-Score 사용
+2. **FN과 FP 모두 중요** → Precision, Recall, F1-Score 모니터링
+3. **오류 비용이 다름** → 혼동 행렬로 오류 패턴 확인
+4. **전반적 성능** → 클래스가 균형잡힌 경우 일반 Accuracy도 유용
+
+figures의 혼동 행렬 시각화는 실제 오류 패턴을 보여주며, 모델이 스트레스 받은 식물을 놓치는 경향(FN)이 있는지 거짓 경보를 발생시키는 경향(FP)이 있는지 식별하는 데 도움이 됩니다.
 
 ---
 
@@ -1020,138 +1220,6 @@ data/raw/PlantSounds/
 
 </details>
 
----
-
-## 모델 아키텍처
-
-### Baseline CNN (Khait et al., 2023)
-
-![Baseline](experiments/figures/baseline_architecture.svg)
-
-### MyModel (Baseline CNN + VAE + SSL + DG)
-
-![MyModel](experiments/figures/mymodel_architecture.svg)
-
-
-**아키텍처 상세**:
-
-- **Backbone**: Baseline과 동일한 CNN 구조 (Khait et al., 2023)
-- **임베딩 h**: CNN backbone에서 추출한 128차원 특징 표현
-- **Main Classifier**: h → 이진 로짓 (BCEWithLogitsLoss)
-- **VAE 모듈**:
-  - 인코더: h → (μ, log σ²) 32차원 잠재 공간
-  - 재매개변수화: z = μ + σ ⊙ ε
-  - 디코더: z → h_재구성
-  - 손실: MSE(h, h_rec) + β·KL(q(z|h) || N(0, I))
-- **SSL (반지도 학습)**:
-  - z(x)와 z(x_증강) 간 일관성 정규화
-  - 라벨 없는 데이터 학습 가능 (50% 라벨 실험)
-- **DG (도메인 일반화)**:
-  - 도메인 분류기 헤드: h → 도메인 로짓
-  - 녹음 조건 간 강건성 향상
-
----
-
-## 학습 프로토콜
-
-### 데이터 전처리
-
-1. **리샘플링**: 모든 오디오를 500 kHz로
-2. **세그먼테이션**: 2ms 윈도우 (1000 샘플)
-3. **고역 통과 필터**: 저주파 노이즈 제거
-4. **정규화**: 평균 0, 분산 1
-
-### 교차 검증
-
-**LOPO (Leave-One-Plant-Out)**:
-- 각 fold는 한 식물의 모든 녹음을 홀드아웃
-- 새로운 개체에 대한 일반화 테스트
-- 무작위 분할보다 현실적인 평가
-
-### 학습 설정
-
-```python
-Optimizer: Adam (lr=5e-4)
-Loss: BCEWithLogitsLoss (클래스 균형 포함)
-Batch size: 64
-Epochs: 10 (조기 종료 포함)
-```
-
-### 평가 지표 (Evaluation Metrics)
-
-이 프로젝트는 포괄적인 성능 평가를 위해 여러 분류 지표를 사용합니다:
-
-#### 주요 지표
-
-##### 1. Balanced Accuracy (균형 정확도) - 본 프로젝트의 주 지표
-
-- 공식: `(Recall + Specificity) / 2 = (TPR + TNR) / 2`
-- **사용 이유**: 식물 스트레스 데이터셋은 클래스 불균형이 있습니다 (특히 LOPO에서 각 fold는 하나의 스트레스 조건을 가진 한 식물만 테스트할 수 있음). Balanced accuracy는 클래스별 recall을 평균하여 두 클래스를 동등하게 취급하므로, 불균형 데이터에서 일반 accuracy보다 신뢰할 수 있습니다.
-- **해석**: 완벽한 점수 = 1.0, 무작위 추측 = 0.5
-
-##### 2. Accuracy (정확도)
-
-- 공식: `(TP + TN) / (TP + TN + FP + FN)`
-- 전체 샘플 중 올바른 예측의 비율
-- **한계**: 클래스 불균형 시 오해의 소지가 있음 (예: 모든 샘플을 한 클래스로 예측해도 높은 accuracy 가능)
-
-#### 추가 중요 지표
-
-##### 3. Precision (정밀도, 양성 예측도)
-
-- 공식: `TP / (TP + FP)`
-- "양성으로 예측한 것 중 실제로 양성인 비율은?"
-- **사용 사례**: 거짓 경보(FP)의 비용이 클 때 중요
-- 높은 precision = 신뢰할 수 있는 양성 예측
-
-##### 4. Recall (재현율, 민감도, True Positive Rate)
-
-- 공식: `TP / (TP + FN)`
-- "실제 양성 샘플 중 얼마나 많이 올바르게 식별했는가?"
-- **사용 사례**: 양성을 놓치는 것(FN)의 비용이 클 때 중요
-- 높은 recall = 실제 양성 케이스 대부분/전부 찾아냄
-
-##### 5. Specificity (특이도, True Negative Rate)
-
-- 공식: `TN / (TN + FP)`
-- "실제 음성 샘플 중 얼마나 많이 올바르게 식별했는가?"
-- 모델이 음성 클래스를 얼마나 잘 식별하는지 측정
-
-##### 6. F1-Score (F1 점수)
-
-- 공식: `2 × (Precision × Recall) / (Precision + Recall)`
-- Precision과 Recall의 조화 평균
-- **사용 사례**: 균형 잡힌 precision과 recall이 필요할 때
-- Precision이나 Recall 중 하나가 낮으면 F1-score도 낮아짐
-
-#### 혼동 행렬(Confusion Matrix) 이해하기
-
-```
-                  예측
-              음성      양성
-실제  음성      TN        FP      ← False Positive: 거짓 경보
-      양성      FN        TP      ← False Negative: 놓친 검출
-                 ↑
-            놓친 케이스
-```
-
-- **TP (True Positive)**: 양성을 올바르게 예측 (예: 스트레스 받은 식물을 정확히 식별)
-- **TN (True Negative)**: 음성을 올바르게 예측 (예: 스트레스 없는 식물을 정확히 식별)
-- **FP (False Positive)**: 양성으로 잘못 예측 (거짓 경보 - 괜찮은 식물을 스트레스 받았다고 예측)
-- **FN (False Negative)**: 음성으로 잘못 예측 (놓친 검출 - 실제 스트레스를 감지하지 못함)
-
-#### 지표 선택 가이드라인
-
-이 식물 스트레스 분류 프로젝트의 경우:
-
-1. **클래스 불균형 존재** → Balanced Accuracy + F1-Score 사용
-2. **FN과 FP 모두 중요** → Precision, Recall, F1-Score 모니터링
-3. **오류 유형별 비용 차이** → 혼동 행렬에서 오류 패턴 확인
-4. **전반적 성능** → 클래스가 균형잡혔을 때 일반 Accuracy도 유용
-
-그림의 혼동 행렬 시각화는 실제 오류 패턴을 보여주며, 모델이 스트레스 받은 식물을 놓치는 경향(FN)이 있는지 거짓 경보를 내는 경향(FP)이 있는지 식별하는 데 도움을 줍니다.
-
----
 
 ## 실험 실행
 
@@ -1238,60 +1306,6 @@ python -m src.analysis.plot_results
 3. **실시간 시스템**: 연속 온실 모니터링을 위한 배포
 4. **다중 모달 통합**: 음향 데이터와 이미징 및 환경 센서 결합
 5. **시간적 역학**: 시간 경과에 따른 스트레스 진행 분석
-
----
-
-## 파일 구조
-
-```
-plant_model/
-├── data/
-│   ├── raw/
-│   │   └── PlantSounds/          # 원본 데이터셋 (.wav 파일)
-│   └── processed/                 # 전처리된 데이터 (git에서 제외)
-├── experiments/
-│   ├── task1_baseline/            # Baseline 결과 (CSV 파일만)
-│   ├── task1_my_model/            # 개선 모델 결과 (CSV 파일만)
-│   ├── task2_baseline/            # Task 2 baseline 결과
-│   ├── task2_my_model/            # Task 2 개선 결과
-│   ├── task3_baseline/            # Task 3 baseline 결과
-│   ├── task3_my_model/            # Task 3 개선 결과
-│   ├── task4_my_model/            # Task 4 반지도 학습 결과
-│   └── figures/                   # 생성된 시각화 그래프
-├── src/
-│   ├── datasets/
-│   │   └── plantsounds.py         # 데이터 로딩 & LOPO 분할
-│   ├── models/
-│   │   ├── baseline_cnn.py        # Baseline CNN (Khait et al. 2023)
-│   │   └── my_model.py            # 개선 모델 (VAE + SSL + DG)
-│   ├── training/
-│   │   ├── common.py              # 공유 학습 유틸리티
-│   │   ├── train_task1.py         # Task 1 baseline 학습
-│   │   ├── train_my_model_task1.py # Task 1 개선 학습
-│   │   ├── train_task2.py         # Task 2 baseline 학습
-│   │   ├── train_my_model_task2.py # Task 2 개선 학습
-│   │   ├── train_task3.py         # Task 3 baseline 학습
-│   │   ├── train_my_model_task3.py # Task 3 개선 학습
-│   │   └── train_my_model_task4.py # Task 4 반지도 학습
-│   ├── utils/
-│   │   ├── audio.py               # 오디오 처리 유틸리티
-│   │   └── split.py               # 데이터 분할 유틸리티
-│   └── analysis/
-│       └── plot_results.py        # 시각화 및 분석 스크립트
-├── .venv.zip                      # 압축된 가상환경
-├── .gitignore                     # Git 무시 규칙 (체크포인트 제외)
-├── requirements.txt
-├── verify_plots.py                # 플롯 데이터 검증 스크립트
-├── validate_plot_consistency.py  # 데이터 일관성 검증
-└── README.md
-```
-
-**중요 사항**:
-- **모델 체크포인트 제거**: 모든 `.pth` 및 `.pt` 파일은 저장소 크기 축소를 위해 `.gitignore`를 통해 제외됨 (~6GB → 관리 가능한 크기)
-- **결과 보존**: 정확도 지표 및 fold별 결과를 포함하는 CSV 파일은 `experiments/`에 유지됨
-- **가상환경 압축**: `.venv`는 `.venv.zip`으로 제공됨 - 사용 전 압축 해제 필요
-- **원시 데이터 포함**: 원본 `.wav` 오디오 파일은 `data/raw/PlantSounds/`에 보존됨
-- **실험 재현**: `src/training/`의 학습 스크립트를 사용하여 모델 재학습 필요
 
 ---
 
