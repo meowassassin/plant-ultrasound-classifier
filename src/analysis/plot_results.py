@@ -610,7 +610,7 @@ def _plot_single_confusion(ax, cm: np.ndarray, title: str, task_name: str):
     ax.set_yticks([0, 1])
     ax.set_xticklabels([f"Pred\n{c}" for c in classes], fontsize=10, fontweight="bold")
     ax.set_yticklabels([f"True\n{c}" for c in classes], fontsize=10, fontweight="bold")
-    ax.set_title(title, pad=10, fontsize=12, fontweight="bold")
+    ax.set_title(title, pad=10, fontsize=11, fontweight="bold", wrap=True)
 
     # Add colorbar (only if matrix is not empty)
     if not is_empty:
@@ -633,7 +633,7 @@ def plot_confusions_task1(fig_root: Path, base_cm, my_cm):
         return
 
     # Create subplot with only valid rows
-    fig, axes = plt.subplots(len(valid_items), 2, figsize=(9, 2.4 * len(valid_items)))
+    fig, axes = plt.subplots(len(valid_items), 2, figsize=(10, 2.8 * len(valid_items)))
     if len(valid_items) == 1:
         axes = axes.reshape(1, 2)
     else:
@@ -649,13 +649,13 @@ def plot_confusions_task1(fig_root: Path, base_cm, my_cm):
         _plot_single_confusion(
             axes[plot_idx, 1],
             my_cm[key],
-            title=f"{TASK1_LABELS[orig_idx]} – Proposed CNN Model",
+            title=f"{TASK1_LABELS[orig_idx]} – Proposed CNN Model (100% labels)",
             task_name=key,
         )
 
-    fig.suptitle("Task1: confusion matrices (LOPO pooled)", fontsize=14)
-    fig.tight_layout(rect=[0, 0.03, 1, 0.95])
-    fig.savefig(fig_root / "task1_confusion_matrices.png", dpi=300)
+    fig.suptitle("Task1: confusion matrices (LOPO pooled)", fontsize=14, y=0.98)
+    fig.tight_layout(rect=[0, 0.01, 1, 0.96], h_pad=3.0, w_pad=2.0)
+    fig.savefig(fig_root / "task1_confusion_matrices.png", dpi=300, bbox_inches='tight')
 
 
 def plot_confusions_task23(fig_root: Path, base_cm, my_cm):
@@ -675,13 +675,95 @@ def plot_confusions_task23(fig_root: Path, base_cm, my_cm):
         _plot_single_confusion(
             axes[i, 1],
             my_cm[key],
-            title=f"{titles[i]} – Proposed CNN Model",
+            title=f"{titles[i]} – Proposed CNN Model (100% labels)",
             task_name=key,
         )
 
-    fig.suptitle("Task2 / Task3: confusion matrices (LOPO pooled)", fontsize=14, y=0.98)
-    fig.tight_layout(rect=[0, 0.01, 1, 0.96])
+    fig.suptitle("Task2 / Task3: confusion matrices (LOPO pooled)", fontsize=14, y=0.99)
+    fig.tight_layout(rect=[0, 0.01, 1, 0.97], h_pad=3.5, w_pad=2.5)
     fig.savefig(fig_root / "task2_task3_confusion_matrices.png", dpi=300, bbox_inches="tight")
+
+
+def compute_confusions_task4(exp_root: Path):
+    """
+    Compute confusion matrices for Task 4 (semi-supervised learning).
+    Returns confusion matrices for 100% labels and 50% labels.
+    """
+    my_cm_full = {}
+    my_cm_semi = {}
+
+    # Task 4 uses task1 subtasks with different label fractions
+    for key in TASK1_KEYS:
+        # 100% labels
+        try:
+            my_cm_full[key] = reconstruct_confusion_for_model(
+                key,
+                exp_root / "task1_proposed_model" / f"{key}_lopo_results.csv",
+            )
+        except FileNotFoundError:
+            my_cm_full[key] = np.zeros((2, 2), dtype=int)
+
+        # 50% labels (Task 4) - try both naming patterns
+        try:
+            # Try pattern 1: task4_{key}_lopo_results.csv
+            csv_path = exp_root / "task4_proposed_model" / f"task4_{key}_lopo_results.csv"
+            if not csv_path.exists():
+                # Try pattern 2: {key}_lopo_results_labeled0.5.csv
+                csv_path = exp_root / "task4_proposed_model" / f"{key}_lopo_results_labeled0.5.csv"
+
+            my_cm_semi[key] = reconstruct_confusion_for_model(key, csv_path)
+        except (FileNotFoundError, Exception) as e:
+            my_cm_semi[key] = np.zeros((2, 2), dtype=int)
+
+    return my_cm_full, my_cm_semi
+
+
+def plot_confusions_task4(fig_root: Path, exp_root: Path):
+    """
+    Plot confusion matrices for Task 4 comparing 100% labels vs 50% labels.
+    Shows the effect of semi-supervised learning.
+    """
+    try:
+        my_cm_full, my_cm_semi = compute_confusions_task4(exp_root)
+    except Exception as e:
+        print(f"[WARN] Cannot generate Task4 confusion matrices: {e}")
+        return
+
+    # Filter out empty confusion matrices
+    valid_items = []
+    for i, key in enumerate(TASK1_KEYS):
+        if my_cm_full[key].sum() > 0 and my_cm_semi[key].sum() > 0:
+            valid_items.append((i, key))
+
+    if len(valid_items) == 0:
+        print("[WARN] No valid confusion matrices to plot for Task4")
+        return
+
+    # Create subplot with only valid rows
+    fig, axes = plt.subplots(len(valid_items), 2, figsize=(10, 2.8 * len(valid_items)))
+    if len(valid_items) == 1:
+        axes = axes.reshape(1, 2)
+    else:
+        axes = axes.reshape(len(valid_items), 2)
+
+    for plot_idx, (orig_idx, key) in enumerate(valid_items):
+        _plot_single_confusion(
+            axes[plot_idx, 0],
+            my_cm_full[key],
+            title=f"{TASK1_LABELS[orig_idx]} – Proposed CNN Model (100% labels)",
+            task_name=key,
+        )
+        _plot_single_confusion(
+            axes[plot_idx, 1],
+            my_cm_semi[key],
+            title=f"{TASK1_LABELS[orig_idx]} – Proposed CNN Model (50% labels)",
+            task_name=key,
+        )
+
+    fig.suptitle("Task4: Semi-supervised Learning Effect (LOPO pooled)", fontsize=14, y=0.98)
+    fig.tight_layout(rect=[0, 0.01, 1, 0.96], h_pad=3.0, w_pad=2.0)
+    fig.savefig(fig_root / "task4_confusion_matrices.png", dpi=300, bbox_inches='tight')
+    print(f"Saved: {fig_root / 'task4_confusion_matrices.png'}")
 
 
 def plot_metrics_summary_table(fig_root: Path, exp_root: Path):
@@ -1335,6 +1417,9 @@ def main():
         base_cm23, my_cm23 = compute_confusions_task23(exp_root)
         plot_confusions_task23(fig_root, base_cm23, my_cm23)
 
+        # Task4 confusion matrices (100% vs 50% labels)
+        plot_confusions_task4(fig_root, exp_root)
+
         print("      ✓ Confusion matrices generated")
     except FileNotFoundError as e:
         print(f"      [WARN] Skipping (raw data not available)")
@@ -1362,9 +1447,10 @@ def main():
     print("  1. metrics_summary_table.png")
     print("  2. task1_confusion_matrices.png")
     print("  3. task2_task3_confusion_matrices.png")
-    print("  4. task1_balanced_accuracy_bar.png")
-    print("  5. task2_task3_balanced_accuracy_bar.png")
-    print("  6. task4_label_fraction_effect.png")
+    print("  4. task4_confusion_matrices.png")
+    print("  5. task1_balanced_accuracy_bar.png")
+    print("  6. task2_task3_balanced_accuracy_bar.png")
+    print("  7. task4_label_fraction_effect.png")
     print(f"\nLocation: {fig_root}")
     print("=" * 70)
 

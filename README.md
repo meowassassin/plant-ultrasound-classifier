@@ -583,9 +583,13 @@ The confusion matrix visualizations in the figures show the actual error pattern
 
 ### Task 4 Results Visualization
 
-**Figure 3: Task 4 Semi-Supervised Learning Effect**
+**Figure 3a: Task 4 Semi-Supervised Learning Effect - Performance Comparison**
 ![Task 4 Label Fraction Effect](experiments/figures/task4_label_fraction_effect.png)
 *Grouped bar chart comparing Baseline CNN, Proposed CNN Model (50% labels), and Proposed CNN Model (100% labels) across all 4 Task 1 subtasks. Each task shows three bars for easy comparison. Arrows and percentages indicate improvement from semi-supervised to fully-supervised learning. This clear visualization demonstrates label efficiency with minimal performance drop when using only 50% labeled data.*
+
+**Figure 3b: Task 4 Confusion Matrices - Label Fraction Comparison**
+![Task 4 Confusion Matrices](experiments/figures/task4_confusion_matrices.png)
+*Confusion matrices comparing Proposed CNN Model performance with 100% labels (left) vs 50% labels (right) for all 4 Task 1 subtasks. This detailed view shows how semi-supervised learning maintains high classification accuracy across all confusion matrix cells, with only minimal increases in misclassifications when using half the labeled data. The LOPO (Leave-One-Plant-Out) pooled results demonstrate robust generalization.*
 
 ---
 
@@ -1319,9 +1323,13 @@ figures의 혼동 행렬 시각화는 실제 오류 패턴을 보여주며, 모�
 
 ### Task 4 결과 시각화
 
-**그림 3: Task 4 반지도 학습 효과**
+**그림 3a: Task 4 반지도 학습 효과 - 성능 비교**
 ![Task 4 라벨 비율 효과](experiments/figures/task4_label_fraction_effect.png)
 *4개 Task 1 하위 과제에 대한 Baseline CNN, Proposed CNN Model (50% 라벨), Proposed CNN Model (100% 라벨)을 비교하는 그룹화된 막대 그래프. 각 과제는 쉬운 비교를 위해 세 개의 막대를 보여줌. 화살표와 백분율은 반지도에서 완전 지도 학습으로의 개선을 나타냄. 이 명확한 시각화는 50% 라벨 데이터만 사용했을 때의 최소한의 성능 저하로 라벨 효율성을 입증.*
+
+**그림 3b: Task 4 혼동 행렬 - 라벨 비율 비교**
+![Task 4 혼동 행렬](experiments/figures/task4_confusion_matrices.png)
+*4개 Task 1 하위 과제에 대해 100% 라벨(왼쪽)과 50% 라벨(오른쪽)을 사용한 Proposed CNN Model 성능을 비교하는 혼동 행렬. 이 상세한 뷰는 반지도 학습이 모든 혼동 행렬 셀에서 높은 분류 정확도를 유지하며, 라벨 데이터의 절반만 사용했을 때 오분류가 최소한으로만 증가함을 보여줌. LOPO (Leave-One-Plant-Out) 풀링 결과는 강건한 일반화를 입증.*
 
 ---
 
