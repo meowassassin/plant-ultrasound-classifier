@@ -127,8 +127,8 @@ CLASS_LABELS = {
 
 def load_task1_results(exp_root: Path):
     base_dir = exp_root / "task1_baseline"
-    my_dir = exp_root / "task1_my_model"
-    semi_dir = exp_root / "task4_my_model"
+    my_dir = exp_root / "task1_proposed_model"
+    semi_dir = exp_root / "task4_proposed_model"
 
     baseline = {}
     my_full = {}
@@ -139,11 +139,11 @@ def load_task1_results(exp_root: Path):
         f_base = base_dir / f"{key}_lopo_results.csv"
         baseline[key] = summarize_lopo_csv(f_base)
 
-        # MyModel (full label)
+        # Proposed CNN Model (full label)
         f_my = my_dir / f"{key}_lopo_results.csv"
         my_full[key] = summarize_lopo_csv(f_my)
 
-        # MyModel (Task4, 50% label)
+        # Proposed CNN Model (Task4, 50% label)
         f_semi = semi_dir / f"task4_{key}_lopo_results.csv"
         my_semi[key] = summarize_lopo_csv(f_semi)
 
@@ -182,11 +182,11 @@ def plot_task1_bar(fig_root: Path, baseline, my_full, my_semi):
                   edgecolor="black", linewidth=1.2, alpha=0.85,
                   error_kw={"linewidth": 2, "ecolor": "black", "capthick": 2})
     bar2 = ax.bar(x, my_means, width, yerr=my_yerr_clipped,
-                  capsize=5, color=colors[1], label="MyModel (full)",
+                  capsize=5, color=colors[1], label="Proposed CNN Model (full)",
                   edgecolor="black", linewidth=1.2, alpha=0.85,
                   error_kw={"linewidth": 2, "ecolor": "black", "capthick": 2})
     bar3 = ax.bar(x + width, semi_means, width, yerr=semi_yerr_clipped,
-                  capsize=5, color=colors[2], label="MyModel (50% label)",
+                  capsize=5, color=colors[2], label="Proposed CNN Model (50% label)",
                   edgecolor="black", linewidth=1.2, alpha=0.85,
                   error_kw={"linewidth": 2, "ecolor": "black", "capthick": 2})
 
@@ -221,7 +221,7 @@ def plot_task1_box(fig_root: Path, baseline, my_full):
         data = [baseline[key]["bal_vals"], my_full[key]["bal_vals"]]
 
         # Improved boxplot style
-        bp = ax.boxplot(data, tick_labels=["Baseline", "MyModel"],
+        bp = ax.boxplot(data, tick_labels=["Baseline", "Proposed CNN Model"],
                        patch_artist=True, widths=0.6,
                        boxprops=dict(linewidth=1.5, edgecolor="black"),
                        whiskerprops=dict(linewidth=1.5, color="black"),
@@ -272,7 +272,7 @@ def load_task23_results(exp_root: Path):
     )
     t2_my = summarize_lopo_csv(
         exp_root
-        / "task2_my_model"
+        / "task2_proposed_model"
         / "task2_plant_vs_empty_lopo_results_labeled1.0.csv"
     )
 
@@ -282,7 +282,7 @@ def load_task23_results(exp_root: Path):
     )
     t3_my = summarize_lopo_csv(
         exp_root
-        / "task3_my_model"
+        / "task3_proposed_model"
         / "task3_tomato_vs_greenhouse_lopo_results_labeled1.0.csv"
     )
 
@@ -312,7 +312,7 @@ def plot_task23_bar(fig_root: Path, t2, t3):
            edgecolor="black", linewidth=1.2, alpha=0.85,
            error_kw={"linewidth": 2, "ecolor": "black", "capthick": 2})
     ax.bar(x + width / 2, my_means, width, yerr=my_yerr_clipped,
-           capsize=5, color=colors[1], label="MyModel",
+           capsize=5, color=colors[1], label="Proposed CNN Model",
            edgecolor="black", linewidth=1.2, alpha=0.85,
            error_kw={"linewidth": 2, "ecolor": "black", "capthick": 2})
 
@@ -337,7 +337,7 @@ def plot_task23_bar(fig_root: Path, t2, t3):
 def plot_task4_semi_effect(fig_root: Path, baseline, my_full, my_semi):
     """
     Clear grouped bar chart showing semi-supervised learning effect.
-    Compares Baseline vs MyModel (50% labels) vs MyModel (100% labels) across all tasks.
+    Compares Baseline vs Proposed CNN Model (50% labels) vs Proposed CNN Model (100% labels) across all tasks.
     """
     fig, ax = plt.subplots(figsize=(16, 8))
 
@@ -371,13 +371,13 @@ def plot_task4_semi_effect(fig_root: Path, baseline, my_full, my_semi):
 
     bars2 = ax.bar(x, semi_means, width,
                    yerr=semi_stds, capsize=5,
-                   label='MyModel (50% labels)', color=semi_color,
+                   label='Proposed CNN Model (50% labels)', color=semi_color,
                    edgecolor='black', linewidth=1.2, alpha=0.85,
                    error_kw={'linewidth': 2, 'ecolor': 'black', 'capthick': 2})
 
     bars3 = ax.bar(x + width, full_means, width,
                    yerr=full_stds, capsize=5,
-                   label='MyModel (100% labels)', color=full_color,
+                   label='Proposed CNN Model (100% labels)', color=full_color,
                    edgecolor='black', linewidth=1.2, alpha=0.85,
                    error_kw={'linewidth': 2, 'ecolor': 'black', 'capthick': 2})
 
@@ -530,7 +530,7 @@ def reconstruct_confusion_for_model(task_name: str, csv_path: Path) -> np.ndarra
 
 def compute_confusions_task1(exp_root: Path):
     base_dir = exp_root / "task1_baseline"
-    my_dir = exp_root / "task1_my_model"
+    my_dir = exp_root / "task1_proposed_model"
 
     base_cm = {}
     my_cm = {}
@@ -558,7 +558,7 @@ def compute_confusions_task23(exp_root: Path):
     my_cm["task2_plant_vs_empty"] = reconstruct_confusion_for_model(
         "task2_plant_vs_empty",
         exp_root
-        / "task2_my_model"
+        / "task2_proposed_model"
         / "task2_plant_vs_empty_lopo_results_labeled1.0.csv",
     )
 
@@ -572,7 +572,7 @@ def compute_confusions_task23(exp_root: Path):
     my_cm["task3_tomato_vs_greenhouse"] = reconstruct_confusion_for_model(
         "task3_tomato_vs_greenhouse",
         exp_root
-        / "task3_my_model"
+        / "task3_proposed_model"
         / "task3_tomato_vs_greenhouse_lopo_results_labeled1.0.csv",
     )
 
@@ -649,7 +649,7 @@ def plot_confusions_task1(fig_root: Path, base_cm, my_cm):
         _plot_single_confusion(
             axes[plot_idx, 1],
             my_cm[key],
-            title=f"{TASK1_LABELS[orig_idx]} – MyModel",
+            title=f"{TASK1_LABELS[orig_idx]} – Proposed CNN Model",
             task_name=key,
         )
 
@@ -675,7 +675,7 @@ def plot_confusions_task23(fig_root: Path, base_cm, my_cm):
         _plot_single_confusion(
             axes[i, 1],
             my_cm[key],
-            title=f"{titles[i]} – MyModel",
+            title=f"{titles[i]} – Proposed CNN Model",
             task_name=key,
         )
 
@@ -725,7 +725,7 @@ def plot_metrics_summary_table(fig_root: Path, exp_root: Path):
 
         rows.append({
             'Task': task_label,
-            'Model': 'MyModel',
+            'Model': 'Proposed CNN Model',
             'Accuracy': my_m['accuracy'],
             'Bal.Acc': my_m['balanced_accuracy'],
             'Macro-F1': my_m['macro_f1'],
@@ -779,8 +779,8 @@ def plot_metrics_summary_table(fig_root: Path, exp_root: Path):
         model = display_data[i-1][1]
         for j in range(8):
             cell = table[(i, j)]
-            if model == 'MyModel':
-                cell.set_facecolor('#E8F4F8')  # Light blue for MyModel
+            if model == 'Proposed CNN Model':
+                cell.set_facecolor('#E8F4F8')  # Light blue for Proposed CNN Model
             elif i % 2 == 1:
                 cell.set_facecolor('#F5F5F5')  # Light gray alternating
             else:
@@ -799,7 +799,7 @@ def plot_metrics_summary_table(fig_root: Path, exp_root: Path):
 
 
 # ---------------------------------------------------------
-# Paired scatter (baseline vs MyModel, per-fold basis)
+# Paired scatter (baseline vs Proposed CNN Model, per-fold basis)
 # ---------------------------------------------------------
 def plot_task1_paired_scatter(fig_root: Path, baseline, my_full):
     fig, axes = plt.subplots(2, 2, figsize=(12, 10))
@@ -825,7 +825,7 @@ def plot_task1_paired_scatter(fig_root: Path, baseline, my_full):
         ax.grid(True, alpha=0.3, linestyle="--", zorder=0)
 
         ax.set_xlabel("Baseline balanced acc", fontsize=12, fontweight="bold")
-        ax.set_ylabel("MyModel balanced acc", fontsize=12, fontweight="bold")
+        ax.set_ylabel("Proposed CNN Model balanced acc", fontsize=12, fontweight="bold")
         ax.set_title(TASK1_LABELS[idx], fontsize=13, fontweight="bold", pad=10)
         ax.set_xlim(vmin - 0.02, vmax + 0.02)
         ax.set_ylim(vmin - 0.02, vmax + 0.02)
@@ -835,7 +835,7 @@ def plot_task1_paired_scatter(fig_root: Path, baseline, my_full):
         # Add legend
         ax.legend(loc="upper left", fontsize=9, framealpha=0.9)
 
-    fig.suptitle("Task1: Fold-wise Baseline vs MyModel Comparison",
+    fig.suptitle("Task1: Fold-wise Baseline vs Proposed CNN Model Comparison",
                 fontsize=16, fontweight="bold", y=0.995)
     fig.tight_layout(rect=[0, 0.01, 1, 0.98])
     fig.savefig(fig_root / "task1_paired_scatter.png", dpi=300, bbox_inches="tight")
@@ -857,7 +857,7 @@ def plot_task23_paired_scatter(fig_root: Path, t2, t3):
     ax.grid(True, alpha=0.3, linestyle="--", zorder=0)
     ax.set_title("Task2: plant vs empty pot", fontsize=13, fontweight="bold", pad=10)
     ax.set_xlabel("Baseline balanced acc", fontsize=12, fontweight="bold")
-    ax.set_ylabel("MyModel balanced acc", fontsize=12, fontweight="bold")
+    ax.set_ylabel("Proposed CNN Model balanced acc", fontsize=12, fontweight="bold")
     ax.set_xlim(vmin - 0.02, vmax + 0.02)
     ax.set_ylim(vmin - 0.02, vmax + 0.02)
     ax.set_aspect("equal", adjustable="box")
@@ -877,14 +877,14 @@ def plot_task23_paired_scatter(fig_root: Path, t2, t3):
     ax.grid(True, alpha=0.3, linestyle="--", zorder=0)
     ax.set_title("Task3: tomato vs greenhouse noise", fontsize=13, fontweight="bold", pad=10)
     ax.set_xlabel("Baseline balanced acc", fontsize=12, fontweight="bold")
-    ax.set_ylabel("MyModel balanced acc", fontsize=12, fontweight="bold")
+    ax.set_ylabel("Proposed CNN Model balanced acc", fontsize=12, fontweight="bold")
     ax.set_xlim(vmin - 0.02, vmax + 0.02)
     ax.set_ylim(vmin - 0.02, vmax + 0.02)
     ax.set_aspect("equal", adjustable="box")
     ax.tick_params(axis='both', labelsize=10)
     ax.legend(loc="upper left", fontsize=9, framealpha=0.9)
 
-    fig.suptitle("Task2 / Task3: Baseline vs MyModel Comparison",
+    fig.suptitle("Task2 / Task3: Baseline vs Proposed CNN Model Comparison",
                 fontsize=16, fontweight="bold", y=0.98)
     fig.tight_layout(rect=[0, 0.01, 1, 0.96])
     fig.savefig(fig_root / "task2_task3_paired_scatter.png", dpi=300, bbox_inches="tight")
@@ -906,7 +906,7 @@ def load_fold_level_data_with_metadata(exp_root: Path, task_name: str, model_typ
     if model_type == "baseline":
         csv_path = exp_root / "task1_baseline" / f"{task_name}_lopo_results.csv"
     elif model_type == "mymodel":
-        csv_path = exp_root / "task1_my_model" / f"{task_name}_lopo_results.csv"
+        csv_path = exp_root / "task1_proposed_model" / f"{task_name}_lopo_results.csv"
     else:
         raise ValueError(f"Unknown model_type: {model_type}")
 
@@ -985,7 +985,7 @@ def plot_fold_accuracy_dry(fig_root: Path, exp_root: Path):
             accs_dry_jittered = np.array(accs_dry) + jitter
             ax.scatter(folds_dry, accs_dry_jittered, marker='s', s=50,
                        color='#E1812C', alpha=0.6, edgecolors='black',
-                       linewidth=0.5, label='MyModel (dry)', zorder=3)
+                       linewidth=0.5, label='Proposed CNN Model (dry)', zorder=3)
             ax.plot(folds_dry, accs_dry, color='#E1812C', linewidth=1.5,
                     alpha=0.3, zorder=1)
 
@@ -1043,7 +1043,7 @@ def plot_fold_accuracy_cut(fig_root: Path, exp_root: Path):
             accs_cut_jittered = np.array(accs_cut) + jitter
             ax.scatter(folds_cut, accs_cut_jittered, marker='s', s=50,
                        color='#E1812C', alpha=0.6, edgecolors='black',
-                       linewidth=0.5, label='MyModel (cut)', zorder=3)
+                       linewidth=0.5, label='Proposed CNN Model (cut)', zorder=3)
             ax.plot(folds_cut, accs_cut, color='#E1812C', linewidth=1.5,
                     alpha=0.3, zorder=1)
 
@@ -1117,7 +1117,7 @@ def plot_classwise_accuracy_bar(fig_root: Path, exp_root: Path):
                error_kw={"linewidth": 2, "ecolor": "black", "capthick": 2})
         ax.bar(x + width/2, [my_dry_acc, my_cut_acc], width,
                yerr=my_yerr_clipped, capsize=5,
-               color='#E1812C', label='MyModel', edgecolor='black',
+               color='#E1812C', label='Proposed CNN Model', edgecolor='black',
                linewidth=1.2, alpha=0.85,
                error_kw={"linewidth": 2, "ecolor": "black", "capthick": 2})
 
@@ -1186,8 +1186,8 @@ def plot_sequential_performance(fig_root: Path, exp_root: Path):
         legend_elements = [
             Patch(facecolor='#87CEEB', edgecolor='#3274A1', label='Baseline (dry)'),
             Patch(facecolor='#FFB6C1', edgecolor='#3274A1', label='Baseline (cut)'),
-            Patch(facecolor='#FFD700', edgecolor='#E1812C', label='MyModel (dry)'),
-            Patch(facecolor='#FF8C00', edgecolor='#E1812C', label='MyModel (cut)'),
+            Patch(facecolor='#FFD700', edgecolor='#E1812C', label='Proposed CNN Model (dry)'),
+            Patch(facecolor='#FF8C00', edgecolor='#E1812C', label='Proposed CNN Model (cut)'),
         ]
         ax.legend(handles=legend_elements, fontsize=8, loc='lower right')
 
@@ -1271,7 +1271,7 @@ def plot_per_plant_heatmap(fig_root: Path, exp_root: Path):
             ax.set_yticklabels(['Dry', 'Cut'], fontsize=10, fontweight='bold')
             ax.set_xlabel('Plant ID', fontsize=10, fontweight='bold')
 
-            model_label = "Baseline CNN" if model_type == "baseline" else "MyModel"
+            model_label = "Baseline CNN" if model_type == "baseline" else "Proposed CNN Model"
             ax.set_title(f"{species} - {model_label}",
                         fontsize=12, fontweight='bold', pad=10)
 
@@ -1299,7 +1299,7 @@ def main():
     1. Metrics summary table (Accuracy, Bal.Acc, Macro-F1, Precision, Recall, Specificity)
     2. Task1 confusion matrices (4 tasks including tomato/tobacco dry vs cut)
     3. Task2/3 confusion matrices (plant vs empty, tomato vs greenhouse)
-    4. Task1 comparison bar plot (Baseline vs MyModel)
+    4. Task1 comparison bar plot (Baseline vs Proposed CNN Model)
     5. Task2/3 comparison bar plot
     6. Semi-supervised effect plot (label fraction)
 

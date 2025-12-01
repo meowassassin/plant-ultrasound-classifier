@@ -63,28 +63,28 @@ plant_model/
 │   └── processed/                 # Preprocessed data (excluded from git)
 ├── experiments/
 │   ├── task1_baseline/            # Baseline results (CSV files only)
-│   ├── task1_my_model/            # Enhanced model results (CSV files only)
+│   ├── task1_proposed_model/            # Enhanced model results (CSV files only)
 │   ├── task2_baseline/            # Task 2 baseline results
-│   ├── task2_my_model/            # Task 2 enhanced results
+│   ├── task2_proposed_model/            # Task 2 enhanced results
 │   ├── task3_baseline/            # Task 3 baseline results
-│   ├── task3_my_model/            # Task 3 enhanced results
-│   ├── task4_my_model/            # Task 4 semi-supervised results
+│   ├── task3_proposed_model/            # Task 3 enhanced results
+│   ├── task4_proposed_model/            # Task 4 semi-supervised results
 │   └── figures/                   # Generated visualization plots
 ├── src/
 │   ├── datasets/
 │   │   └── plantsounds.py         # Data loading & LOPO splits
 │   ├── models/
 │   │   ├── baseline_cnn.py        # Baseline CNN (Khait et al. 2023)
-│   │   └── my_model.py            # Enhanced model (VAE + SSL + DG)
+│   │   └── proposed_cnn_model.py            # Enhanced model (VAE + SSL + DG)
 │   ├── training/
 │   │   ├── common.py              # Shared training utilities
 │   │   ├── train_task1.py         # Task 1 baseline training
-│   │   ├── train_my_model_task1.py # Task 1 enhanced training
+│   │   ├── train_proposed_model_task1.py # Task 1 enhanced training
 │   │   ├── train_task2.py         # Task 2 baseline training
-│   │   ├── train_my_model_task2.py # Task 2 enhanced training
+│   │   ├── train_proposed_model_task2.py # Task 2 enhanced training
 │   │   ├── train_task3.py         # Task 3 baseline training
-│   │   ├── train_my_model_task3.py # Task 3 enhanced training
-│   │   └── train_my_model_task4.py # Task 4 semi-supervised training
+│   │   ├── train_proposed_model_task3.py # Task 3 enhanced training
+│   │   └── train_proposed_model_task4.py # Task 4 semi-supervised training
 │   ├── utils/
 │   │   ├── audio.py               # Audio processing utilities
 │   │   └── split.py               # Data splitting utilities
@@ -121,34 +121,103 @@ We reproduced and extended their baseline CNN model for ultrasonic plant sound c
 
 ## Research Background
 
-Plants emit ultrasonic sounds (20-150 kHz) when experiencing stress conditions such as drought or physical damage. Khait et al. (2023) demonstrated that these sounds are:
+### Plant Acoustic Communication
 
-- **Airborne and detectable** at distances up to several meters
-- **Informative** about the plant's physiological state
-- **Distinguishable** between different stress types and plant species
+Plants emit ultrasonic sounds (20-150 kHz) when experiencing physiological stress conditions such as drought or physical damage. Recent research by Khait et al. (2023) has revealed that these acoustic emissions are not random noise, but contain meaningful information about the plant's internal state.
 
-The ability to classify plant sounds has significant implications for:
-- **Precision agriculture**: Early stress detection for optimal irrigation
-- **Plant phenotyping**: Non-invasive monitoring of plant health
-- **Ecosystem monitoring**: Understanding plant-environment interactions
+**Key Findings from Khait et al. (2023)**:
+
+- **Airborne and detectable**: Ultrasonic emissions can be detected at distances up to several meters using standard microphones
+- **Informative content**: Sound patterns correlate with specific physiological stress conditions (drought vs. mechanical damage)
+- **Species-specific signatures**: Different plant species (tomato, tobacco, wheat, etc.) produce distinguishable acoustic patterns
+- **Temporal dynamics**: Emission frequency increases under stress (from ~1 sound/hour in healthy plants to ~30-50 sounds/hour under drought)
+
+### Motivation for Deep Learning Approach
+
+Traditional acoustic analysis methods face several challenges:
+- **Manual feature engineering**: Requires domain expertise and may miss subtle patterns
+- **Limited generalization**: Handcrafted features may not transfer across species or conditions
+- **Noise sensitivity**: Background greenhouse noise and recording variations affect performance
+
+Deep learning offers several advantages:
+- **Automatic feature learning**: CNN architectures can discover optimal representations from raw audio
+- **Robustness**: Neural networks can learn to ignore irrelevant variations while preserving discriminative features
+- **Scalability**: Once trained, models can process thousands of recordings efficiently
+
+### Applications and Impact
+
+The ability to classify plant sounds has transformative implications for:
+
+**Precision Agriculture**:
+- Early stress detection before visible symptoms appear (typically 3-5 days earlier)
+- Automated irrigation optimization based on real-time plant water status
+- Reduction in water usage (estimated 20-30%) while maintaining crop yield
+
+**Plant Science Research**:
+- Non-invasive monitoring of plant physiological responses to environmental stimuli
+- High-throughput phenotyping for breeding programs
+- Understanding plant communication and stress response mechanisms
+
+**Ecosystem Monitoring**:
+- Continuous monitoring of plant health in natural ecosystems
+- Early detection of drought or disease outbreaks
+- Climate change impact assessment on vegetation
 
 ---
 
 ## Research Objectives
 
-This project aims to:
+### Primary Goals
 
-1. **Reproduce** the baseline CNN classifier from Khait et al. (2023)
-2. **Improve** classification performance with advanced deep learning architectures
-3. **Explore** semi-supervised learning to reduce labeling requirements
-4. **Analyze** the robustness of models across different plant species and stress types
+This project aims to advance plant acoustic classification through deep learning with the following objectives:
+
+1. **Reproduce and Validate** the baseline CNN classifier from Khait et al. (2023)
+   - Implement the original architecture with identical hyperparameters
+   - Verify reported performance metrics using LOPO cross-validation
+   - Establish a reliable baseline for comparison
+
+2. **Improve Classification Performance** with advanced deep learning architectures
+   - Incorporate Variational Autoencoder (VAE) for robust feature learning
+   - Apply domain generalization techniques to handle recording variations
+   - Enhance model capacity while preventing overfitting on small datasets
+
+3. **Reduce Labeling Requirements** through semi-supervised learning
+   - Investigate performance with limited labeled data (50% labels)
+   - Leverage unlabeled recordings through consistency regularization
+   - Enable practical deployment in low-resource settings
+
+4. **Comprehensive Evaluation** across diverse classification tasks
+   - Species identification (tomato vs. tobacco)
+   - Stress type discrimination (drought vs. mechanical damage)
+   - Background noise separation (plant sounds vs. greenhouse noise)
+   - Cross-plant generalization using LOPO validation
 
 ### Key Innovations
 
-- **Enhanced CNN Architecture**: Improved model with attention mechanisms and residual connections
-- **Semi-supervised Learning**: Effective learning with only 50% labeled data
-- **Comprehensive Evaluation**: LOPO (Leave-One-Plant-Out) cross-validation for robust assessment
-- **Multi-task Analysis**: Classification across species, stress types, and background noise
+**1. Enhanced CNN Architecture (Proposed Model)**:
+- **VAE module**: Learns compressed latent representations that capture essential acoustic features
+- **Semi-supervised learning**: Consistency regularization enables learning from unlabeled data
+- **Domain generalization**: Domain classifier helps the model become invariant to recording conditions
+- **Improved capacity**: Deeper architecture with careful regularization to prevent overfitting
+
+**2. Rigorous Evaluation Protocol**:
+- **LOPO cross-validation**: Tests generalization to unseen individual plants (more realistic than random splits)
+- **Comprehensive metrics**: Reports accuracy, balanced accuracy, precision, recall, specificity, and macro F1-score
+- **Multiple tasks**: Evaluates performance across 6 distinct binary classification problems
+- **Statistical robustness**: Uses mean and standard deviation across multiple folds
+
+**3. Practical Considerations**:
+- **Small dataset regime**: Techniques specifically designed for limited training data (~100-300 samples per class)
+- **Real-world applicability**: Models tested on actual greenhouse recordings with background noise
+- **Interpretability**: Confusion matrices reveal specific failure modes and areas for improvement
+
+### Expected Outcomes
+
+By the end of this research, we aim to demonstrate:
+- Improved classification accuracy over the baseline (target: +2-5% balanced accuracy)
+- Robust performance with only 50% labeled data (target: within 3% of full supervision)
+- Successful generalization across different plant individuals and recording sessions
+- Practical feasibility of automated plant stress monitoring systems
 
 ---
 
@@ -182,9 +251,9 @@ data/raw/PlantSounds/
 
 ![Baseline](experiments/figures/baseline_architecture.svg)
 
-### MyModel (Baseline CNN + VAE + SSL + DG)
+### Proposed CNN Model (Baseline CNN + VAE + SSL + DG)
 
-![MyModel](experiments/figures/mymodel_architecture.svg)
+![Proposed CNN Model](experiments/figures/proposed_cnn_model_architecture.svg)
 
 **Architecture Details**:
 
@@ -328,8 +397,8 @@ The confusion matrix visualizations in the figures show the actual error pattern
 **Results** (see Fig. 1a, 1b, 1e, 1g):
 
 - **Baseline CNN**: 95.2% balanced accuracy
-- **MyModel (full labels)**: 97.6% balanced accuracy (+2.4%)
-- **MyModel (50% labels)**: 93.3% balanced accuracy
+- **Proposed CNN Model (full labels)**: 97.6% balanced accuracy (+2.4%)
+- **Proposed CNN Model (50% labels)**: 93.3% balanced accuracy
 
 ---
 
@@ -347,8 +416,8 @@ The confusion matrix visualizations in the figures show the actual error pattern
 **Results** (see Fig. 1a, 1b, 1f, 1g):
 
 - **Baseline CNN**: 87.7% balanced accuracy
-- **MyModel (full labels)**: **100.0%** balanced accuracy (perfect classification!)
-- **MyModel (50% labels)**: 100.0% balanced accuracy (maintained perfect performance)
+- **Proposed CNN Model (full labels)**: **100.0%** balanced accuracy (perfect classification!)
+- **Proposed CNN Model (50% labels)**: 100.0% balanced accuracy (maintained perfect performance)
 
 **Key Finding**: Tobacco stress classification appears easier than tomato, possibly due to more distinctive acoustic signatures.
 
@@ -368,8 +437,8 @@ The confusion matrix visualizations in the figures show the actual error pattern
 **Results** (see Fig. 1a):
 
 - **Baseline CNN**: 87.5% balanced accuracy
-- **MyModel (full labels)**: 88.7% balanced accuracy (+1.2%)
-- **MyModel (50% labels)**: 85.7% balanced accuracy
+- **Proposed CNN Model (full labels)**: 88.7% balanced accuracy (+1.2%)
+- **Proposed CNN Model (50% labels)**: 85.7% balanced accuracy
 
 ---
 
@@ -387,8 +456,8 @@ The confusion matrix visualizations in the figures show the actual error pattern
 **Results** (see Fig. 1a):
 
 - **Baseline CNN**: 93.4% balanced accuracy
-- **MyModel (full labels)**: 96.9% balanced accuracy (+3.5%)
-- **MyModel (50% labels)**: 96.2% balanced accuracy
+- **Proposed CNN Model (full labels)**: 96.9% balanced accuracy (+3.5%)
+- **Proposed CNN Model (50% labels)**: 96.2% balanced accuracy
 
 **Key Finding**: Cut condition provides clearer species discrimination than dry condition, suggesting mechanical damage produces more species-specific acoustic responses.
 
@@ -398,11 +467,11 @@ The confusion matrix visualizations in the figures show the actual error pattern
 
 **Figure 1a: Task 1 Confusion Matrices**
 ![Task 1 Confusion Matrices](experiments/figures/task1_confusion_matrices.png)
-*Pooled confusion matrices across all LOPO folds for each Task 1 subtask. Shows classification errors for both Baseline CNN and MyModel. All tasks including tomato/tobacco dry vs cut are successfully visualized.*
+*Pooled confusion matrices across all LOPO folds for each Task 1 subtask. Shows classification errors for both Baseline CNN and Proposed CNN Model. All tasks including tomato/tobacco dry vs cut are successfully visualized.*
 
 **Figure 1b: Task 1 Mean Balanced Accuracy Comparison**
 ![Task 1 Bar Chart](experiments/figures/task1_balanced_accuracy_bar.png)
-*Comparison of mean balanced accuracy across all 4 Task 1 subtasks. Shows Baseline CNN, MyModel (100% labels), and MyModel (50% labels) performance.*
+*Comparison of mean balanced accuracy across all 4 Task 1 subtasks. Shows Baseline CNN, Proposed CNN Model (100% labels), and Proposed CNN Model (50% labels) performance.*
 
 ---
 
@@ -422,7 +491,7 @@ The confusion matrix visualizations in the figures show the actual error pattern
 **Results** (see Fig. 2a, 2c):
 
 - **Baseline CNN**: 95.9% balanced accuracy
-- **MyModel**: 98.5% balanced accuracy (+2.6%)
+- **Proposed CNN Model**: 98.5% balanced accuracy (+2.6%)
 
 **Key Findings**:
 
@@ -450,12 +519,12 @@ The confusion matrix visualizations in the figures show the actual error pattern
 **Results** (see Fig. 2a, 2c):
 
 - **Baseline CNN**: 98.4% balanced accuracy
-- **MyModel**: 98.2% balanced accuracy (-0.2%)
+- **Proposed CNN Model**: 98.2% balanced accuracy (-0.2%)
 
 **Key Findings**:
 
 - Both models achieve near-perfect classification even with complex environmental noise
-- Slight decrease in MyModel performance suggests baseline may be sufficient for this easier task
+- Slight decrease in Proposed CNN Model performance suggests baseline may be sufficient for this easier task
 - High accuracy in real-world noise conditions demonstrates practical deployment viability
 - Plant acoustic signals remain highly discriminable even in noisy greenhouse environments
 
@@ -475,7 +544,7 @@ The confusion matrix visualizations in the figures show the actual error pattern
 
 ### Task 4: Semi-Supervised Learning Effect
 
-**Objective**: Evaluate the robustness of MyModel's semi-supervised learning approach by reducing labeled training data from 100% to 50%.
+**Objective**: Evaluate the robustness of Proposed CNN Model's semi-supervised learning approach by reducing labeled training data from 100% to 50%.
 
 **Motivation**: In real-world scenarios, obtaining labeled data is expensive and time-consuming. Semi-supervised learning leverages unlabeled data to maintain performance with fewer labels, making large-scale deployment more practical.
 
@@ -485,7 +554,7 @@ The confusion matrix visualizations in the figures show the actual error pattern
 - **Partial labels (50%)**: Only 50% of training samples are labeled; remaining 50% are used as unlabeled data for semi-supervised learning
 - **Cross-validation**: Same LOPO splits as Task 1, with random 50% label selection per fold
 
-**Implementation**: MyModel uses a consistency regularization approach where:
+**Implementation**: Proposed CNN Model uses a consistency regularization approach where:
 
 1. Labeled samples: Standard supervised loss (cross-entropy)
 2. Unlabeled samples: Consistency loss between predictions under different augmentations
@@ -508,7 +577,7 @@ The confusion matrix visualizations in the figures show the actual error pattern
 - **Label efficiency**: Achieving 93-100% performance with 50% labels represents substantial cost savings
 - **Semi-supervised benefit**: All 50% label results significantly outperform baseline, confirming the value of unlabeled data
 
-**Implications**: The strong performance with reduced labels validates MyModel's semi-supervised approach for practical deployment where labeling all data is infeasible.
+**Implications**: The strong performance with reduced labels validates Proposed CNN Model's semi-supervised approach for practical deployment where labeling all data is infeasible.
 
 ---
 
@@ -516,7 +585,7 @@ The confusion matrix visualizations in the figures show the actual error pattern
 
 **Figure 3: Task 4 Semi-Supervised Learning Effect**
 ![Task 4 Label Fraction Effect](experiments/figures/task4_label_fraction_effect.png)
-*Grouped bar chart comparing Baseline CNN, MyModel (50% labels), and MyModel (100% labels) across all 4 Task 1 subtasks. Each task shows three bars for easy comparison. Arrows and percentages indicate improvement from semi-supervised to fully-supervised learning. This clear visualization demonstrates label efficiency with minimal performance drop when using only 50% labeled data.*
+*Grouped bar chart comparing Baseline CNN, Proposed CNN Model (50% labels), and Proposed CNN Model (100% labels) across all 4 Task 1 subtasks. Each task shows three bars for easy comparison. Arrows and percentages indicate improvement from semi-supervised to fully-supervised learning. This clear visualization demonstrates label efficiency with minimal performance drop when using only 50% labeled data.*
 
 ---
 
@@ -528,14 +597,14 @@ After completing all experimental tasks (Task 1-4), here is a comprehensive summ
 
 ![Metrics Summary Table](experiments/figures/metrics_summary_table.svg)
 
-**Table Description**: Academic-style metrics summary showing all key classification metrics for all 6 tasks (Task 1: 4 subtasks, Task 2, Task 3). Includes Accuracy, Balanced Accuracy, Macro F1-Score, Precision, Recall, and Specificity for both Baseline CNN and MyModel.
+**Table Description**: Academic-style metrics summary showing all key classification metrics for all 6 tasks (Task 1: 4 subtasks, Task 2, Task 3). Includes Accuracy, Balanced Accuracy, Macro F1-Score, Precision, Recall, and Specificity for both Baseline CNN and Proposed CNN Model.
 
 **Key Insights from Metrics**:
 
 - **Balanced Performance**: Both models achieve strong precision, recall, and specificity across all tasks
 - **Macro F1-Score**: Validates overall classification quality by averaging per-class F1 scores
-- **Task-specific Patterns**: Task 1.2 (Tobacco dry vs cut) shows perfect metrics (1.000) for MyModel, while noise separation tasks (Task 2/3) show consistently high performance (>0.95) for both models
-- **Consistent Improvement**: MyModel generally outperforms Baseline across most metrics and tasks
+- **Task-specific Patterns**: Task 1.2 (Tobacco dry vs cut) shows perfect metrics (1.000) for Proposed CNN Model, while noise separation tasks (Task 2/3) show consistently high performance (>0.95) for both models
+- **Consistent Improvement**: Proposed CNN Model generally outperforms Baseline across most metrics and tasks
 
 ---
 
@@ -558,11 +627,11 @@ data/raw/PlantSounds/
 # Task 1: Baseline
 python -m src.training.train_task1
 
-# Task 1: MyModel (full labels)
-python -m src.training.train_task1_mymodel
+# Task 1: Proposed CNN Model (full labels)
+python -m src.training.train_task1_proposed_model
 
-# Task 1: MyModel (semi-supervised, 50% labels)
-python -m src.training.train_task1_mymodel_semi
+# Task 1: Proposed CNN Model (semi-supervised, 50% labels)
+python -m src.training.train_task1_proposed_model_semi
 
 # Task 2 & 3
 python -m src.training.train_task2
@@ -587,9 +656,9 @@ python -m src.analysis.plot_results
 | Model | Task Type | Mean Accuracy | Key Advantage |
 |-------|-----------|---------------|---------------|
 | Baseline CNN | Plant-Plant | 90.7% | Simple, reproducible |
-| MyModel (full) | Plant-Plant | 93.1% | +2.4% improvement |
-| MyModel (50%) | Plant-Plant | 90.3% | Label efficiency |
-| MyModel | Plant-Noise | 98.4% | Near-perfect separation |
+| Proposed CNN Model (full) | Plant-Plant | 93.1% | +2.4% improvement |
+| Proposed CNN Model (50%) | Plant-Plant | 90.3% | Label efficiency |
+| Proposed CNN Model | Plant-Noise | 98.4% | Near-perfect separation |
 
 ### Key Achievements
 
@@ -727,28 +796,28 @@ plant_model/
 │   └── processed/                 # 전처리된 데이터 (git에서 제외)
 ├── experiments/
 │   ├── task1_baseline/            # Baseline 결과 (CSV 파일만)
-│   ├── task1_my_model/            # 개선 모델 결과 (CSV 파일만)
+│   ├── task1_proposed_model/            # 개선 모델 결과 (CSV 파일만)
 │   ├── task2_baseline/            # Task 2 baseline 결과
-│   ├── task2_my_model/            # Task 2 개선 결과
+│   ├── task2_proposed_model/            # Task 2 개선 결과
 │   ├── task3_baseline/            # Task 3 baseline 결과
-│   ├── task3_my_model/            # Task 3 개선 결과
-│   ├── task4_my_model/            # Task 4 반지도 학습 결과
+│   ├── task3_proposed_model/            # Task 3 개선 결과
+│   ├── task4_proposed_model/            # Task 4 반지도 학습 결과
 │   └── figures/                   # 생성된 시각화 그래프
 ├── src/
 │   ├── datasets/
 │   │   └── plantsounds.py         # 데이터 로딩 & LOPO 분할
 │   ├── models/
 │   │   ├── baseline_cnn.py        # Baseline CNN (Khait et al. 2023)
-│   │   └── my_model.py            # 개선 모델 (VAE + SSL + DG)
+│   │   └── proposed_cnn_model.py            # 개선 모델 (VAE + SSL + DG)
 │   ├── training/
 │   │   ├── common.py              # 공유 학습 유틸리티
 │   │   ├── train_task1.py         # Task 1 baseline 학습
-│   │   ├── train_my_model_task1.py # Task 1 개선 학습
+│   │   ├── train_proposed_model_task1.py # Task 1 개선 학습
 │   │   ├── train_task2.py         # Task 2 baseline 학습
-│   │   ├── train_my_model_task2.py # Task 2 개선 학습
+│   │   ├── train_proposed_model_task2.py # Task 2 개선 학습
 │   │   ├── train_task3.py         # Task 3 baseline 학습
-│   │   ├── train_my_model_task3.py # Task 3 개선 학습
-│   │   └── train_my_model_task4.py # Task 4 반지도 학습
+│   │   ├── train_proposed_model_task3.py # Task 3 개선 학습
+│   │   └── train_proposed_model_task4.py # Task 4 반지도 학습
 │   ├── utils/
 │   │   ├── audio.py               # 오디오 처리 유틸리티
 │   │   └── split.py               # 데이터 분할 유틸리티
@@ -785,16 +854,47 @@ plant_model/
 
 ## 연구 배경
 
-식물은 가뭄이나 물리적 손상과 같은 스트레스 상황에서 초음파 소리(20-150 kHz)를 방출합니다. Khait et al. (2023)은 다음을 증명했습니다:
+### 식물의 음향 커뮤니케이션
 
-- **공중 전파 가능**: 수 미터 거리에서도 감지 가능
-- **정보 내포**: 식물의 생리학적 상태에 대한 정보 포함
-- **구별 가능**: 서로 다른 스트레스 유형 및 식물 종 간 구별 가능
+식물은 가뭄이나 물리적 손상과 같은 생리학적 스트레스 상황에서 초음파 소리(20-150 kHz)를 방출합니다. Khait et al. (2023)의 최근 연구는 이러한 음향 방출이 무작위 노이즈가 아니라 식물의 내부 상태에 대한 의미 있는 정보를 포함하고 있음을 밝혀냈습니다.
 
-식물 소리 분류 능력은 다음과 같은 분야에 중요한 의미를 갖습니다:
-- **정밀 농업**: 최적의 관개를 위한 조기 스트레스 감지
-- **식물 표현형 분석**: 비침습적 식물 건강 모니터링
-- **생태계 모니터링**: 식물-환경 상호작용 이해
+**Khait et al. (2023)의 주요 발견**:
+
+- **공중 전파 및 감지 가능**: 초음파 방출은 표준 마이크를 사용하여 최대 수 미터 거리에서 감지 가능
+- **정보적 내용**: 소리 패턴은 특정 생리학적 스트레스 조건(가뭄 vs. 기계적 손상)과 상관관계가 있음
+- **종별 고유 시그니처**: 서로 다른 식물 종(토마토, 담배, 밀 등)이 구별 가능한 음향 패턴을 생성
+- **시간적 역학**: 스트레스 하에서 방출 빈도가 증가함(건강한 식물: ~1회/시간 → 가뭄 스트레스: ~30-50회/시간)
+
+### 딥러닝 접근법의 동기
+
+전통적인 음향 분석 방법은 여러 과제에 직면합니다:
+- **수동 특징 공학**: 도메인 전문 지식이 필요하며 미묘한 패턴을 놓칠 수 있음
+- **제한된 일반화**: 수작업으로 만든 특징은 종이나 조건에 따라 전이되지 않을 수 있음
+- **노이즈 민감성**: 배경 온실 소음과 녹음 변동이 성능에 영향을 미침
+
+딥러닝은 여러 가지 장점을 제공합니다:
+- **자동 특징 학습**: CNN 아키텍처는 원시 오디오에서 최적의 표현을 발견할 수 있음
+- **강건성**: 신경망은 판별적 특징을 보존하면서 관련 없는 변동을 무시하는 법을 학습할 수 있음
+- **확장성**: 일단 학습되면 모델은 수천 개의 녹음을 효율적으로 처리할 수 있음
+
+### 응용 분야 및 영향
+
+식물 소리 분류 능력은 다음 분야에 혁신적인 의미를 갖습니다:
+
+**정밀 농업**:
+- 가시적 증상이 나타나기 전 조기 스트레스 감지(일반적으로 3-5일 앞서)
+- 실시간 식물 수분 상태 기반 자동화된 관개 최적화
+- 작물 수확량을 유지하면서 물 사용량 감소(추정 20-30%)
+
+**식물 과학 연구**:
+- 환경 자극에 대한 식물 생리학적 반응의 비침습적 모니터링
+- 육종 프로그램을 위한 고처리량 표현형 분석
+- 식물 커뮤니케이션 및 스트레스 반응 메커니즘 이해
+
+**생태계 모니터링**:
+- 자연 생태계에서 식물 건강의 지속적인 모니터링
+- 가뭄 또는 질병 발생의 조기 감지
+- 식생에 대한 기후 변화 영향 평가
 
 ---
 
@@ -826,19 +926,57 @@ data/raw/PlantSounds/
 
 ## 연구 목적
 
-본 프로젝트는 다음을 목표로 합니다:
+### 주요 목표
 
-1. Khait et al. (2023)의 baseline CNN 분류기를 **재현**
-2. 고급 딥러닝 아키텍처로 분류 성능 **개선**
-3. 반지도 학습을 통한 라벨링 요구사항 감소 **탐구**
-4. 다양한 식물 종 및 스트레스 유형에 대한 모델 강건성 **분석**
+본 프로젝트는 다음의 목표를 통해 딥러닝을 활용한 식물 음향 분류를 발전시키는 것을 목표로 합니다:
+
+1. **Khait et al. (2023)의 baseline CNN 분류기 재현 및 검증**
+   - 동일한 하이퍼파라미터로 원본 아키텍처 구현
+   - LOPO 교차 검증을 사용하여 보고된 성능 지표 검증
+   - 비교를 위한 신뢰할 수 있는 baseline 확립
+
+2. **고급 딥러닝 아키텍처로 분류 성능 개선**
+   - 강건한 특징 학습을 위한 Variational Autoencoder (VAE) 통합
+   - 녹음 변동을 처리하기 위한 도메인 일반화 기법 적용
+   - 소규모 데이터셋에서 과적합을 방지하면서 모델 용량 향상
+
+3. **반지도 학습을 통한 라벨링 요구사항 감소**
+   - 제한된 라벨 데이터(50% 라벨)로 성능 조사
+   - 일관성 정규화를 통해 라벨 없는 녹음 활용
+   - 자원이 제한된 환경에서의 실용적 배포 가능
+
+4. **다양한 분류 과제에 대한 포괄적 평가**
+   - 종 식별(토마토 vs. 담배)
+   - 스트레스 유형 판별(가뭄 vs. 기계적 손상)
+   - 배경 소음 분리(식물 소리 vs. 온실 소음)
+   - LOPO 검증을 사용한 교차 식물 일반화
 
 ### 주요 혁신 사항
 
-- **개선된 CNN 아키텍처**: 어텐션 메커니즘과 잔차 연결을 포함한 향상된 모델
-- **반지도 학습**: 50% 라벨 데이터만으로도 효과적인 학습
-- **포괄적 평가**: 강건한 평가를 위한 LOPO (Leave-One-Plant-Out) 교차 검증
-- **다중 작업 분석**: 종, 스트레스 유형, 배경 소음에 걸친 분류
+**1. 강화된 CNN 아키텍처 (제안 모델)**:
+- **VAE 모듈**: 필수 음향 특징을 포착하는 압축된 잠재 표현 학습
+- **반지도 학습**: 일관성 정규화를 통해 라벨 없는 데이터로부터 학습 가능
+- **도메인 일반화**: 도메인 분류기가 모델이 녹음 조건에 불변하도록 도움
+- **향상된 용량**: 과적합을 방지하기 위한 신중한 정규화를 갖춘 더 깊은 아키텍처
+
+**2. 엄격한 평가 프로토콜**:
+- **LOPO 교차 검증**: 보지 못한 개별 식물에 대한 일반화 테스트(무작위 분할보다 현실적)
+- **포괄적 지표**: 정확도, 균형 정확도, 정밀도, 재현율, 특이도, 매크로 F1 점수 보고
+- **다중 작업**: 6개의 서로 다른 이진 분류 문제에 대한 성능 평가
+- **통계적 강건성**: 여러 fold에 걸친 평균 및 표준 편차 사용
+
+**3. 실용적 고려사항**:
+- **소규모 데이터셋 환경**: 제한된 학습 데이터(클래스당 ~100-300 샘플)를 위해 특별히 설계된 기법
+- **실제 적용 가능성**: 배경 소음이 있는 실제 온실 녹음에서 테스트된 모델
+- **해석 가능성**: 혼동 행렬이 특정 실패 모드 및 개선 영역을 드러냄
+
+### 기대 결과
+
+이 연구가 끝날 때까지 다음을 입증하는 것을 목표로 합니다:
+- baseline 대비 향상된 분류 정확도(목표: 균형 정확도 +2-5%)
+- 50% 라벨 데이터만으로도 강건한 성능(목표: 완전 지도 학습 대비 3% 이내)
+- 서로 다른 식물 개체 및 녹음 세션에 걸친 성공적인 일반화
+- 자동화된 식물 스트레스 모니터링 시스템의 실용적 타당성
 
 ---
 
@@ -848,9 +986,9 @@ data/raw/PlantSounds/
 
 ![Baseline](experiments/figures/baseline_architecture.svg)
 
-### MyModel (Baseline CNN + VAE + SSL + DG)
+### Proposed CNN Model (Baseline CNN + VAE + SSL + DG)
 
-![MyModel](experiments/figures/mymodel_architecture.svg)
+![Proposed CNN Model](experiments/figures/proposed_cnn_model_architecture.svg)
 
 **아키텍처 세부사항**:
 
@@ -995,8 +1133,8 @@ figures의 혼동 행렬 시각화는 실제 오류 패턴을 보여주며, 모�
 **결과** (그림 1a, 1b, 1e, 1g 참조):
 
 - **Baseline CNN**: 95.2% 균형 정확도
-- **MyModel (전체 라벨)**: 97.6% 균형 정확도 (+2.4%)
-- **MyModel (50% 라벨)**: 93.3% 균형 정확도
+- **Proposed CNN Model (전체 라벨)**: 97.6% 균형 정확도 (+2.4%)
+- **Proposed CNN Model (50% 라벨)**: 93.3% 균형 정확도
 
 ---
 
@@ -1014,8 +1152,8 @@ figures의 혼동 행렬 시각화는 실제 오류 패턴을 보여주며, 모�
 **결과** (그림 1a, 1b, 1f, 1g 참조):
 
 - **Baseline CNN**: 87.7% 균형 정확도
-- **MyModel (전체 라벨)**: **100.0%** 균형 정확도 (완벽한 분류!)
-- **MyModel (50% 라벨)**: 100.0% 균형 정확도 (완벽한 성능 유지)
+- **Proposed CNN Model (전체 라벨)**: **100.0%** 균형 정확도 (완벽한 분류!)
+- **Proposed CNN Model (50% 라벨)**: 100.0% 균형 정확도 (완벽한 성능 유지)
 
 **주요 발견**: 담배 스트레스 분류가 토마토보다 쉬운 것으로 나타났으며, 이는 더 뚜렷한 음향 특징 때문일 수 있습니다.
 
@@ -1035,8 +1173,8 @@ figures의 혼동 행렬 시각화는 실제 오류 패턴을 보여주며, 모�
 **결과** (그림 1a 참조):
 
 - **Baseline CNN**: 87.5% 균형 정확도
-- **MyModel (전체 라벨)**: 88.7% 균형 정확도 (+1.2%)
-- **MyModel (50% 라벨)**: 85.7% 균형 정확도
+- **Proposed CNN Model (전체 라벨)**: 88.7% 균형 정확도 (+1.2%)
+- **Proposed CNN Model (50% 라벨)**: 85.7% 균형 정확도
 
 ---
 
@@ -1054,8 +1192,8 @@ figures의 혼동 행렬 시각화는 실제 오류 패턴을 보여주며, 모�
 **결과** (그림 1a 참조):
 
 - **Baseline CNN**: 93.4% 균형 정확도
-- **MyModel (전체 라벨)**: 96.9% 균형 정확도 (+3.5%)
-- **MyModel (50% 라벨)**: 96.2% 균형 정확도
+- **Proposed CNN Model (전체 라벨)**: 96.9% 균형 정확도 (+3.5%)
+- **Proposed CNN Model (50% 라벨)**: 96.2% 균형 정확도
 
 **주요 발견**: Cut 조건이 dry 조건보다 더 명확한 종 구별을 제공하며, 이는 기계적 손상이 더 종 특정적인 음향 반응을 생성함을 시사합니다.
 
@@ -1065,11 +1203,11 @@ figures의 혼동 행렬 시각화는 실제 오류 패턴을 보여주며, 모�
 
 **그림 1a: Task 1 혼동 행렬**
 ![Task 1 혼동 행렬](experiments/figures/task1_confusion_matrices.png)
-*각 Task 1 하위 과제의 모든 LOPO fold에 대한 통합 혼동 행렬. Baseline CNN과 MyModel 모두의 분류 오류를 보여줌. 토마토/담배 dry vs cut을 포함한 모든 과제가 성공적으로 시각화됨.*
+*각 Task 1 하위 과제의 모든 LOPO fold에 대한 통합 혼동 행렬. Baseline CNN과 Proposed CNN Model 모두의 분류 오류를 보여줌. 토마토/담배 dry vs cut을 포함한 모든 과제가 성공적으로 시각화됨.*
 
 **그림 1b: Task 1 평균 균형 정확도 비교**
 ![Task 1 막대 그래프](experiments/figures/task1_balanced_accuracy_bar.png)
-*4개 Task 1 하위 과제 전체의 평균 균형 정확도 비교. Baseline CNN, MyModel (100% 라벨), MyModel (50% 라벨) 성능을 보여줌.*
+*4개 Task 1 하위 과제 전체의 평균 균형 정확도 비교. Baseline CNN, Proposed CNN Model (100% 라벨), Proposed CNN Model (50% 라벨) 성능을 보여줌.*
 
 ---
 
@@ -1089,7 +1227,7 @@ figures의 혼동 행렬 시각화는 실제 오류 패턴을 보여주며, 모�
 **결과** (그림 2a, 2c 참조):
 
 - **Baseline CNN**: 95.9% 균형 정확도
-- **MyModel**: 98.5% 균형 정확도 (+2.6%)
+- **Proposed CNN Model**: 98.5% 균형 정확도 (+2.6%)
 
 **주요 발견**:
 
@@ -1117,12 +1255,12 @@ figures의 혼동 행렬 시각화는 실제 오류 패턴을 보여주며, 모�
 **결과** (그림 2a, 2c 참조):
 
 - **Baseline CNN**: 98.4% 균형 정확도
-- **MyModel**: 98.2% 균형 정확도 (-0.2%)
+- **Proposed CNN Model**: 98.2% 균형 정확도 (-0.2%)
 
 **주요 발견**:
 
 - 두 모델 모두 복잡한 환경 소음에서도 거의 완벽한 분류 달성
-- MyModel 성능의 약간 감소는 이 더 쉬운 작업에 baseline이 충분할 수 있음을 시사
+- Proposed CNN Model 성능의 약간 감소는 이 더 쉬운 작업에 baseline이 충분할 수 있음을 시사
 - 실제 소음 조건에서의 높은 정확도는 실용적 배포 가능성 입증
 - 식물 음향 신호는 시끄러운 온실 환경에서도 높은 구별력 유지
 
@@ -1142,7 +1280,7 @@ figures의 혼동 행렬 시각화는 실제 오류 패턴을 보여주며, 모�
 
 ### Task 4: 반지도 학습 효과
 
-**목표**: 라벨링된 훈련 데이터를 100%에서 50%로 줄여 MyModel의 반지도 학습 접근법의 강건성을 평가.
+**목표**: 라벨링된 훈련 데이터를 100%에서 50%로 줄여 Proposed CNN Model의 반지도 학습 접근법의 강건성을 평가.
 
 **동기**: 실제 시나리오에서 라벨링된 데이터를 얻는 것은 비용이 많이 들고 시간이 소요됩니다. 반지도 학습은 라벨링되지 않은 데이터를 활용하여 더 적은 라벨로 성능을 유지하므로 대규모 배포를 더 실용적으로 만듭니다.
 
@@ -1152,7 +1290,7 @@ figures의 혼동 행렬 시각화는 실제 오류 패턴을 보여주며, 모�
 - **부분 라벨 (50%)**: 훈련 샘플의 50%만 라벨링됨; 나머지 50%는 반지도 학습을 위한 라벨 없는 데이터로 사용
 - **교차 검증**: Task 1과 동일한 LOPO splits, fold당 무작위 50% 라벨 선택
 
-**구현**: MyModel은 일관성 정규화 접근법을 사용:
+**구현**: Proposed CNN Model은 일관성 정규화 접근법을 사용:
 
 1. 라벨링된 샘플: 표준 지도 손실 (교차 엔트로피)
 2. 라벨링되지 않은 샘플: 서로 다른 증강 하의 예측 간 일관성 손실
@@ -1175,7 +1313,7 @@ figures의 혼동 행렬 시각화는 실제 오류 패턴을 보여주며, 모�
 - **라벨 효율성**: 50% 라벨로 93-100% 성능 달성은 상당한 비용 절감
 - **반지도 이점**: 모든 50% 라벨 결과가 baseline을 크게 상회하여 라벨 없는 데이터의 가치 확인
 
-**의미**: 감소된 라벨로의 강력한 성능은 모든 데이터 라벨링이 불가능한 실용적 배포를 위한 MyModel의 반지도 접근법을 검증합니다.
+**의미**: 감소된 라벨로의 강력한 성능은 모든 데이터 라벨링이 불가능한 실용적 배포를 위한 Proposed CNN Model의 반지도 접근법을 검증합니다.
 
 ---
 
@@ -1183,7 +1321,7 @@ figures의 혼동 행렬 시각화는 실제 오류 패턴을 보여주며, 모�
 
 **그림 3: Task 4 반지도 학습 효과**
 ![Task 4 라벨 비율 효과](experiments/figures/task4_label_fraction_effect.png)
-*4개 Task 1 하위 과제에 대한 Baseline CNN, MyModel (50% 라벨), MyModel (100% 라벨)을 비교하는 그룹화된 막대 그래프. 각 과제는 쉬운 비교를 위해 세 개의 막대를 보여줌. 화살표와 백분율은 반지도에서 완전 지도 학습으로의 개선을 나타냄. 이 명확한 시각화는 50% 라벨 데이터만 사용했을 때의 최소한의 성능 저하로 라벨 효율성을 입증.*
+*4개 Task 1 하위 과제에 대한 Baseline CNN, Proposed CNN Model (50% 라벨), Proposed CNN Model (100% 라벨)을 비교하는 그룹화된 막대 그래프. 각 과제는 쉬운 비교를 위해 세 개의 막대를 보여줌. 화살표와 백분율은 반지도에서 완전 지도 학습으로의 개선을 나타냄. 이 명확한 시각화는 50% 라벨 데이터만 사용했을 때의 최소한의 성능 저하로 라벨 효율성을 입증.*
 
 ---
 
@@ -1195,14 +1333,14 @@ figures의 혼동 행렬 시각화는 실제 오류 패턴을 보여주며, 모�
 
 ![지표 요약 테이블](experiments/figures/metrics_summary_table.svg)
 
-**테이블 설명**: 모든 6개 과제(Task 1: 4개 하위과제, Task 2, Task 3)에 대한 모든 주요 분류 지표를 보여주는 학술 논문 스타일 지표 요약 테이블. Baseline CNN과 MyModel 모두에 대한 Accuracy, Balanced Accuracy, Macro F1-Score, Precision, Recall, Specificity를 포함.
+**테이블 설명**: 모든 6개 과제(Task 1: 4개 하위과제, Task 2, Task 3)에 대한 모든 주요 분류 지표를 보여주는 학술 논문 스타일 지표 요약 테이블. Baseline CNN과 Proposed CNN Model 모두에 대한 Accuracy, Balanced Accuracy, Macro F1-Score, Precision, Recall, Specificity를 포함.
 
 **지표에서의 주요 인사이트**:
 
 - **균형 잡힌 성능**: 두 모델 모두 모든 과제에서 강력한 precision, recall, specificity 달성
 - **Macro F1-Score**: 클래스별 F1 점수를 평균하여 전반적인 분류 품질 검증
-- **과제별 패턴**: Task 1.2 (담배 dry vs cut)는 MyModel에서 완벽한 지표(1.000)를 보이는 반면, 소음 분리 과제(Task 2/3)는 두 모델 모두 일관되게 높은 성능(>0.95) 보임
-- **일관된 개선**: MyModel은 대부분의 지표와 과제에서 일반적으로 Baseline을 능가함
+- **과제별 패턴**: Task 1.2 (담배 dry vs cut)는 Proposed CNN Model에서 완벽한 지표(1.000)를 보이는 반면, 소음 분리 과제(Task 2/3)는 두 모델 모두 일관되게 높은 성능(>0.95) 보임
+- **일관된 개선**: Proposed CNN Model은 대부분의 지표와 과제에서 일반적으로 Baseline을 능가함
 
 
 ## 실험 실행
@@ -1224,11 +1362,11 @@ data/raw/PlantSounds/
 # Task 1: Baseline
 python -m src.training.train_task1
 
-# Task 1: MyModel (전체 라벨)
-python -m src.training.train_task1_mymodel
+# Task 1: Proposed CNN Model (전체 라벨)
+python -m src.training.train_task1_proposed_model
 
-# Task 1: MyModel (반지도, 50% 라벨)
-python -m src.training.train_task1_mymodel_semi
+# Task 1: Proposed CNN Model (반지도, 50% 라벨)
+python -m src.training.train_task1_proposed_model_semi
 
 # Task 2 & 3
 python -m src.training.train_task2
@@ -1253,9 +1391,9 @@ python -m src.analysis.plot_results
 | 모델 | 작업 유형 | 평균 정확도 | 주요 장점 |
 |------|-----------|-------------|-----------|
 | Baseline CNN | 식물-식물 | 90.7% | 간단, 재현 가능 |
-| MyModel (전체) | 식물-식물 | 93.1% | +2.4% 개선 |
-| MyModel (50%) | 식물-식물 | 90.3% | 라벨 효율성 |
-| MyModel | 식물-소음 | 98.4% | 거의 완벽한 분리 |
+| Proposed CNN Model (전체) | 식물-식물 | 93.1% | +2.4% 개선 |
+| Proposed CNN Model (50%) | 식물-식물 | 90.3% | 라벨 효율성 |
+| Proposed CNN Model | 식물-소음 | 98.4% | 거의 완벽한 분리 |
 
 ### 주요 성과
 
